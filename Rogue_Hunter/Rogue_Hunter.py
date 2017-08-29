@@ -15,6 +15,13 @@ WindowDimensions = [win32api.GetSystemMetrics(0), win32api.GetSystemMetrics(1)]
 
 print ScreenWidth, ScreenHeight
 
+GridHeight = int(ScreenHeight*0.8)
+while (GridHeight % 20) != 0:
+    GridHeight -= 1
+GridWidth = int(GridHeight*0.95)
+BaseSquareSize = GridHeight/20
+
+print GridWidth, GridHeight
+
 pygame.init()
 pygame.display.set_mode(WindowDimensions)
-
