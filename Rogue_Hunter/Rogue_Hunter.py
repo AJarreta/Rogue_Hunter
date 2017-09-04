@@ -24,4 +24,11 @@ BaseSquareSize = GridHeight/20
 print GridWidth, GridHeight
 
 pygame.init()
-pygame.display.set_mode(WindowDimensions)
+while True:
+    Window = pygame.display.set_mode(WindowDimensions)
+    pygame.draw.rect(Window, BaseWhite, (BaseSquareSize, BaseSquareSize, BaseSquareSize, BaseSquareSize), 0)
+    pygame.display.flip()
+    for event in pygame.event.get():
+        if event.type == MOUSEBUTTONCLICK and event.button(1):
+            pygame.quit()
+            sys.exit()
