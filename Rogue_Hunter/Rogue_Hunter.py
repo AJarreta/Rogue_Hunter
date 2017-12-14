@@ -11,7 +11,7 @@ WindowDimensions = [0, 0]
 GridDimensions = [0, 0]
 PlayingGrid = {}
 RedPlayerStart = [9, 4]
-BluePlayerStart = [9, 15 ]
+BluePlayerStart = [9, 15]
 CurrentRedPlayerPosition = copy.deepcopy(RedPlayerStart)
 CurrentBluePlayerPosition = copy.deepcopy(BluePlayerStart)
 RedStartingMovements = 100
@@ -19,8 +19,6 @@ BlueStartingMovements = 100
 NumberOfColumns = 19
 NumberOfLines = 20
 MaxMovements = 10
-CurrentTurnMovements = 0
-NextTurnSwitch = False
 FPS = 30
 
 # COLOURS DEFINITION
@@ -34,14 +32,14 @@ def GridConstructor(RedPosition, BluePosition, SquareSize, StartingPositionA, St
     InputGrid = {}
     CurrentPositionA = copy.deepcopy(StartingPositionA)
     CurrentPositionB = copy.deepcopy(StartingPositionB)
-    x = 1
+    x = 0
     for Column in range(NumberOfColumns):
-        y = 1
+        y = 0
         for Line in range(NumberOfLines):
-            CurrentSquare = str(x) + ", " + str(y)
-            if [x-1, y-1] == BluePosition:
+            CurrentSquare = "[" + str(x) + ", " + str(y) + "]"
+            if [x, y] == BluePosition:
                 InputGrid[CurrentSquare] = [copy.deepcopy(CurrentPositionA), copy.deepcopy(CurrentPositionB), 1]
-            elif [x-1, y-1] == RedPosition:
+            elif [x, y] == RedPosition:
                 InputGrid[CurrentSquare] = [copy.deepcopy(CurrentPositionA), copy.deepcopy(CurrentPositionB), 2]
             else:
                 InputGrid[CurrentSquare] = [copy.deepcopy(CurrentPositionA), copy.deepcopy(CurrentPositionB), 0]
@@ -60,14 +58,14 @@ def GridConstructor(RedPosition, BluePosition, SquareSize, StartingPositionA, St
     return InputGrid
 
 def DrawingGrid(InputGrid, Window, OuterSquareSize, InnerSquareSize, Black, Blue, Red, White):
-    x = 1
-    y = 1
+    x = 0
+    y = 0
     for item in range(len(InputGrid)):
-        CurrentSquare = str(x) + ", " + str(y)
+        CurrentSquare = "[" + str(x) + ", " + str(y) + "]"
         if CurrentSquare not in InputGrid.keys():
             x += 1
-            y = 1
-            CurrentSquare = str(x) + ", " + str(y)
+            y = 0
+            CurrentSquare = "[" + str(x) + ", " + str(y) + "]"
         if InputGrid[CurrentSquare][2] == 1:
             pygame.draw.rect(Window, Black, (InputGrid[CurrentSquare][0][0], InputGrid[CurrentSquare][0][1], OuterSquareSize, OuterSquareSize), 0)
             pygame.draw.rect(Window, Blue, (InputGrid[CurrentSquare][1][0], InputGrid[CurrentSquare][1][1], InnerSquareSize, InnerSquareSize), 0)
@@ -88,70 +86,174 @@ def FirstPlayerSelector():
         FirstPlayer = "Blue"
     return FirstPlayer
 
+def GameOver(Window, TextFont, CurrentPlayer, Blue, Red):
+    ScreenWidth = Window.get_width()
+    ScreenHeight = Window.get_height()
+    if CurrentPlayer == 'Blue':
+        CurrentPlayerColour = Blue
+    else:
+        CurrentPlayerColour = Red
+    FirstGameOverLine = TextFont.render('Game Over! ' + CurrentPlayer + ' Player is the winner', False, CurrentPlayerColour)
+    TextWidth = FirstGameOverLine.get_width()
+    TextHeight = FirstGameOverLine.get_height()
+    FirstLinePosition = ((ScreenWidth - TextWidth) / 2, (ScreenHeight / 2) - (TextHeight - 2))
+    Window.blit(FirstGameOverLine, FirstLinePosition)
+    SecondGameOverLine = TextFont.render('Press a key to continue', False, BaseRed)
+    TextWidth = SecondGameOverLine.get_width()
+    TextHeight = SecondGameOverLine.get_height()
+    SecondLinePosition = ((ScreenWidth - TextWidth) / 2, (ScreenHeight / 2) + (TextHeight + 2))
+    Window.blit(SecondGameOverLine, SecondLinePosition)
+    pygame.display.update()
+    pygame.event.clear()
+    pygame.event.wait()
+    for event in pygame.event.get():
+        if event.type == KEYDOWN:
+            Quit()
+
+def TurnChange(Window, TextFont, CurrentPlayer, Blue, Red):
+    ScreenWidth = Window.get_width()
+    ScreenHeight = Window.get_height()
+    if CurrentPlayer == 'Blue':
+        CurrentPlayerColour = Blue
+    else:
+        CurrentPlayerColour = Red
+    TurnChangeText = TextFont.render(CurrentPlayer + " Player Turn", False, CurrentPlayerColour)
+    TextWidth = TurnChangeText.get_width()
+    TextHeight = TurnChangeText.get_height()
+    TextPosition = ((ScreenWidth - TextWidth) / 2, (ScreenHeight / 2) - (TextHeight / 2))
+    Window.blit(TurnChangeText, TextPosition)
+    pygame.display.update()
+    pygame.event.clear()
+    pygame.event.wait()
+    for event in pygame.event.get():
+        if event.type == KEYDOWN:
+            pygame.display.flip()
+            break
+
+def Quit():
+    pygame.quit()
+    sys.exit()
+
 #MAIN LOOP
 def main():
     pygame.init()
+    pygame.font.init()
+    PlainTextFont = pygame.font.SysFont('visitortt1brk', 50)
+    HeaderFont = pygame.font.SysFont('visitortt1brk', 75)
+    NumberFont = pygame. font.SysFont('visitortt1brk', 100)
     FPSClock = pygame.time.Clock()
+    CurrentPlayer = 'Blue'
+    CurrentTurnMovements = 0
+    NextTurnSwitch = False
     pygame.display.set_caption('Rogue Hunter')
-    ROGUE_HUNTERWindow = pygame.display.set_mode(WindowDimensions, pygame.FULLSCREEN, pygame.RESIZABLE)
+    ROGUE_HUNTERWindow = pygame.display.set_mode(WindowDimensions)
     DrawingGrid(PlayingGrid, ROGUE_HUNTERWindow, OuterSquareSize, InnerSquareSize, BaseBlack, BaseBlue, BaseRed, BaseWhite)
     while True:
         if CurrentPlayer == 'Blue':
-            for event in pygame.event.get():
-                if event.type == QUIT:
-                    pygame.quit()
-                    sys.exit()
-                elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE:
-                        pygame.quit()
-                        sys.exit()
-                    elif event.key == pygame.K_LALT and event.key == pygame.K_RETURN:
-                        ROGUE_HUNTERWindow = pygame.display.toggle_fullscreen()
-                    elif event.key == pygame.K_RETURN:
-                        NextTurnSwitch = True
-                    elif event.key == pygame.K_UP or event.key == pygame.K_w:
-                        if CurrentBluePlayerPosition[1] > 0:
-                            CurrentPositionString = str(CurrentBluePlayerPosition[0] + 1) + ", " + str(CurrentBluePlayerPosition[1] + 1)
-                            PlayingGrid[CurrentPositionString][2] = 0
-                            CurrentBluePlayerPosition[1] -= 1
-                            CurrentPositionString = str(CurrentBluePlayerPosition[0] + 1) + ", " + str(CurrentBluePlayerPosition[1] + 1)
-                            PlayingGrid[CurrentPositionString][2] = 1
-                            DrawingGrid(PlayingGrid, ROGUE_HUNTERWindow, OuterSquareSize, InnerSquareSize, BaseBlack, BaseBlue, BaseRed, BaseWhite)
-                            CurrentTurnMovements += 1
-                    elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
-                        if CurrentBluePlayerPosition[1] < (NumberOfLines-1):
-                            CurrentPositionString = str(CurrentBluePlayerPosition[0] + 1) + ", " + str(CurrentBluePlayerPosition[1] + 1)
-                            PlayingGrid[CurrentPositionString][2] = 0
-                            CurrentBluePlayerPosition[1] += 1
-                            CurrentPositionString = str(CurrentBluePlayerPosition[0] + 1) + ", " + str(CurrentBluePlayerPosition[1] + 1)
-                            PlayingGrid[CurrentPositionString][2] = 1
-                            DrawingGrid(PlayingGrid, ROGUE_HUNTERWindow, OuterSquareSize, InnerSquareSize, BaseBlack, BaseBlue, BaseRed, BaseWhite)
-                            CurrentTurnMovements += 1
-                    elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
-                        if CurrentBluePlayerPosition[0] > 0:
-                            CurrentPositionString = str(CurrentBluePlayerPosition[0] + 1) + ", " + str(CurrentBluePlayerPosition[1] + 1)
-                            PlayingGrid[CurrentPositionString][2] = 0
-                            CurrentBluePlayerPosition[0] -= 1
-                            CurrentPositionString = str(CurrentBluePlayerPosition[0] + 1) + ", " + str(CurrentBluePlayerPosition[1] + 1)
-                            PlayingGrid[CurrentPositionString][2] = 1
-                            DrawingGrid(PlayingGrid, ROGUE_HUNTERWindow, OuterSquareSize, InnerSquareSize, BaseBlack, BaseBlue, BaseRed, BaseWhite)
-                            CurrentTurnMovements += 1
-                    elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
-                        if CurrentBluePlayerPosition[0] < (NumberOfColumns-1):
-                            CurrentPositionString = str(CurrentBluePlayerPosition[0] + 1) + ", " + str(CurrentBluePlayerPosition[1] + 1)
-                            PlayingGrid[CurrentPositionString][2] = 0
-                            CurrentBluePlayerPosition[0] += 1
-                            CurrentPositionString = str(CurrentBluePlayerPosition[0] + 1) + ", " + str(CurrentBluePlayerPosition[1] + 1)
-                            PlayingGrid[CurrentPositionString][2] = 1
-                            DrawingGrid(PlayingGrid, ROGUE_HUNTERWindow, OuterSquareSize, InnerSquareSize, BaseBlack, BaseBlue, BaseRed, BaseWhite)
-                            CurrentTurnMovements += 1
-            if CurrentTurnMovements == MaxMovements or NextTurnSwitch == True:
-                CurrentPlayer = 'Red'
-                NextTurnSwitch = False
-                CurrentTurnMovements = 0
-        #elif CurrentPlayer == 'Red':
-
-
+            TurnChange(ROGUE_HUNTERWindow, PlainTextFont, CurrentPlayer, BaseBlue, BaseRed)
+            while True:
+                for event in pygame.event.get():
+                    if event.type == QUIT:
+                        Quit()
+                    elif event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_ESCAPE:
+                            pygame.quit()
+                            return
+                        elif event.key == pygame.K_LALT and event.key == pygame.K_RETURN:
+                            ROGUE_HUNTERWindow = pygame.display.toggle_fullscreen()
+                        elif event.key == pygame.K_RETURN:
+                            NextTurnSwitch = True
+                        elif event.key == pygame.K_UP or event.key == pygame.K_w:
+                            if CurrentBluePlayerPosition[1] > 0:
+                                PlayingGrid[str(CurrentBluePlayerPosition)][2] = 0
+                                CurrentBluePlayerPosition[1] -= 1
+                                PlayingGrid[str(CurrentBluePlayerPosition)][2] = 1
+                                DrawingGrid(PlayingGrid, ROGUE_HUNTERWindow, OuterSquareSize, InnerSquareSize, BaseBlack, BaseBlue, BaseRed, BaseWhite)
+                                CurrentTurnMovements += 1
+                        elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
+                            if CurrentBluePlayerPosition[1] < (NumberOfLines - 1):
+                                PlayingGrid[str(CurrentBluePlayerPosition)][2] = 0
+                                CurrentBluePlayerPosition[1] += 1
+                                PlayingGrid[str(CurrentBluePlayerPosition)][2] = 1
+                                DrawingGrid(PlayingGrid, ROGUE_HUNTERWindow, OuterSquareSize, InnerSquareSize, BaseBlack, BaseBlue, BaseRed, BaseWhite)
+                                CurrentTurnMovements += 1
+                        elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
+                            if CurrentBluePlayerPosition[0] > 0:
+                                PlayingGrid[str(CurrentBluePlayerPosition)][2] = 0
+                                CurrentBluePlayerPosition[0] -= 1
+                                PlayingGrid[str(CurrentBluePlayerPosition)][2] = 1
+                                DrawingGrid(PlayingGrid, ROGUE_HUNTERWindow, OuterSquareSize, InnerSquareSize, BaseBlack, BaseBlue, BaseRed, BaseWhite)
+                                CurrentTurnMovements += 1
+                        elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
+                            if CurrentBluePlayerPosition[0] < (NumberOfColumns-1):
+                                PlayingGrid[str(CurrentBluePlayerPosition)][2] = 0
+                                CurrentBluePlayerPosition[0] += 1
+                                PlayingGrid[str(CurrentBluePlayerPosition)][2] = 1
+                                DrawingGrid(PlayingGrid, ROGUE_HUNTERWindow, OuterSquareSize, InnerSquareSize, BaseBlack, BaseBlue, BaseRed, BaseWhite)
+                                CurrentTurnMovements += 1
+                if CurrentTurnMovements == MaxMovements or NextTurnSwitch == True:
+                    CurrentPlayer = 'Red'
+                    NextTurnSwitch = False
+                    CurrentTurnMovements = 0
+                    break
+                if CurrentBluePlayerPosition == CurrentRedPlayerPosition:
+                    GameOver(ROGUE_HUNTERWindow, PlainTextFont, CurrentPlayer, BaseBlue, BaseRed)
+                    pygame.event.clear()
+                    pygame.event.wait()
+                    if event.type == KEYDOWN:
+                        Quit()
+        elif CurrentPlayer == 'Red':
+            TurnChange(ROGUE_HUNTERWindow, PlainTextFont, CurrentPlayer, BaseBlue, BaseRed)
+            while True:
+                for event in pygame.event.get():
+                    if event.type == QUIT:
+                        Quit()
+                    elif event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_ESCAPE:
+                            Quit()
+                        elif event.key == pygame.K_LALT and event.key == pygame.K_RETURN:
+                            ROGUE_HUNTERWindow = pygame.display.toggle_fullscreen()
+                        elif event.key == pygame.K_RETURN:
+                            NextTurnSwitch = True
+                        elif event.key == pygame.K_UP or event.key == pygame.K_w:
+                            if CurrentRedPlayerPosition[1] > 0:
+                                PlayingGrid[str(CurrentRedPlayerPosition)][2] = 0
+                                CurrentRedPlayerPosition[1] -= 1
+                                PlayingGrid[str(CurrentRedPlayerPosition)][2] = 2
+                                DrawingGrid(PlayingGrid, ROGUE_HUNTERWindow, OuterSquareSize, InnerSquareSize, BaseBlack, BaseBlue, BaseRed, BaseWhite)
+                                CurrentTurnMovements += 1
+                        elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
+                            if CurrentRedPlayerPosition[1] < (NumberOfLines-1):
+                                PlayingGrid[str(CurrentRedPlayerPosition)][2] = 0
+                                CurrentRedPlayerPosition[1] += 1
+                                PlayingGrid[str(CurrentRedPlayerPosition)][2] = 2
+                                DrawingGrid(PlayingGrid, ROGUE_HUNTERWindow, OuterSquareSize, InnerSquareSize, BaseBlack, BaseBlue, BaseRed, BaseWhite)
+                                CurrentTurnMovements += 1
+                        elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
+                            if CurrentRedPlayerPosition[0] > 0:
+                                PlayingGrid[str(CurrentRedPlayerPosition)][2] = 0
+                                CurrentRedPlayerPosition[0] -= 1
+                                PlayingGrid[str(CurrentRedPlayerPosition)][2] = 2
+                                DrawingGrid(PlayingGrid, ROGUE_HUNTERWindow, OuterSquareSize, InnerSquareSize, BaseBlack, BaseBlue, BaseRed, BaseWhite)
+                                CurrentTurnMovements += 1
+                        elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
+                            if CurrentBluePlayerPosition[0] < (NumberOfColumns-1):
+                                PlayingGrid[str(CurrentRedPlayerPosition)][2] = 0
+                                CurrentRedPlayerPosition[0] += 1
+                                PlayingGrid[str(CurrentRedPlayerPosition)][2] = 2
+                                DrawingGrid(PlayingGrid, ROGUE_HUNTERWindow, OuterSquareSize, InnerSquareSize, BaseBlack, BaseBlue, BaseRed, BaseWhite)
+                                CurrentTurnMovements += 1
+                if CurrentTurnMovements == MaxMovements or NextTurnSwitch == True:
+                    CurrentPlayer = 'Blue'
+                    NextTurnSwitch = False
+                    CurrentTurnMovements = 0
+                if CurrentBluePlayerPosition == CurrentRedPlayerPosition:
+                    GameOver(ROGUE_HUNTERWindow, PlainTextFont, CurrentPlayer, BaseBlue, BaseRed)
+                    pygame.event.clear()
+                    pygame.event.wait()
+                    if event.type == KEYDOWN:
+                        Quit()
+                
 
 # CALCULATING THE SIZE OF THE WINDOW AND THE ONSCREEN ELEMENTS
 ScreenWidth = win32api.GetSystemMetrics(0)
@@ -169,8 +271,6 @@ StartingPointB = [copy.deepcopy(int(StartingPointA[0] + (OuterSquareSize - Inner
                  copy.deepcopy(int(StartingPointA[1] + (OuterSquareSize - InnerSquareSize)))]
 global FPSClock, ROGUE_HUNTERWindow, CurrentPlayer
 PlayingGrid = GridConstructor(RedPlayerStart, BluePlayerStart, OuterSquareSize, StartingPointA, StartingPointB)
-CurrentPlayer = FirstPlayerSelector()
 
 if __name__ == '__main__':
     main()
-
