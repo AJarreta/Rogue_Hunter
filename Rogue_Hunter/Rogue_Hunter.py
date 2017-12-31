@@ -77,7 +77,7 @@ def GameOver(Window, TextFont, CurrentPlayer, Blue, Red):
     TextHeight = FirstGameOverLine.get_height()
     FirstLinePosition = ((ScreenWidth - TextWidth) / 2, (ScreenHeight / 2) - (TextHeight - 2))
     Window.blit(FirstGameOverLine, FirstLinePosition)
-    SecondGameOverLine = TextFont.render('Press a key to continue', False, BaseRed)
+    SecondGameOverLine = TextFont.render('Press a key to continue', False, CurrentPlayerColour)
     TextWidth = SecondGameOverLine.get_width()
     TextHeight = SecondGameOverLine.get_height()
     SecondLinePosition = ((ScreenWidth - TextWidth) / 2, (ScreenHeight / 2) + (TextHeight + 2))
@@ -132,14 +132,11 @@ def GameTitle(Window, WindowDimensions, TextFont, White):
     TitleYPosition = (WindowDimensions[1] / 2) - (TextHeight / 2)
     Window.blit(Title, (TitleXPosition, TitleYPosition))
     pygame.display.update()
-    Switch = True
-    while Switch == True:
-        pygame.event.clear()
-        pygame.event.wait()
-        for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN:
-                Switch = False
-    
+    pygame.event.clear()
+    pygame.event.wait()
+    for event in pygame.event.get():
+        if event.type == pygame.KEYDOWN:
+            return
 
 def Quit():
     pygame.quit()
@@ -176,6 +173,7 @@ def main():
                             Quit()
                         elif event.key == pygame.K_f:
                             ROGUE_HUNTERWindow = pygame.display.set_mode(WindowDimensions, pygame.FULLSCREEN)
+                            pygame.display.update()
                         elif event.key == pygame.K_RETURN:
                             NextTurnSwitch = True
                         elif event.key == pygame.K_UP or event.key == pygame.K_w:
@@ -234,8 +232,9 @@ def main():
                     elif event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_ESCAPE:
                             Quit()
-                        elif event.key == pygame.K_LALT and event.key == pygame.K_RETURN:
-                            ROGUE_HUNTERWindow = pygame.display.toggle_fullscreen()
+                        elif event.key == pygame.K_f:
+                            ROGUE_HUNTERWindow = pygame.display.set_mode(WindowDimensions, pygame.FULLSCREEN)
+                            pygame.display.update()
                         elif event.key == pygame.K_RETURN:
                             NextTurnSwitch = True
                         elif event.key == pygame.K_UP or event.key == pygame.K_w:
