@@ -36,6 +36,29 @@ def GridConstructor(RedPosition, BluePosition, SquareSize, StartingPositionA, St
        print item, InputGrid[item]
     return InputGrid
 
+def FirstPlayerSelector():
+    RandomNumber = random.randint(1, 2)
+    if RandomNumber == 1:
+        FirstPlayer = "Red"
+    else:
+        FirstPlayer = "Blue"
+    return FirstPlayer
+
+def TextfontCalculator(DimensionValues):
+    FontSizeDictionary = {}
+    FontSizeDictionary["TitleFontSize"] = int((DimensionValues[1] * 0.25) * 0.75)
+    while (DimensionValues[0] / FontSizeDictionary["TitleFontSize"]) < 10:
+        print FontSizeDictionary["TitleFontSize"]
+        FontSizeDictionary["TitleFontSize"] -= 1
+    FontSizeDictionary["HeaderFontSize"] = int(DimensionValues[1] * 0.10)
+    while (DimensionValues[0] / FontSizeDictionary["HeaderFontSize"]) < 24:
+        FontSizeDictionary["HeaderFontSize"] -= 1
+    FontSizeDictionary["BodyFontSize"] = int(DimensionValues[1] * 0.05)
+    while (DimensionValues[0] / FontSizeDictionary["BodyFontSize"]) < 35:
+        FontSizeDictionary["BodyFontSize"] -= 1
+    print FontSizeDictionary
+    return FontSizeDictionary
+
 def DrawingGrid(InputGrid, Window, OuterSquareSize, InnerSquareSize, Black, Blue, Red, White):
     x = 0
     y = 0
@@ -56,28 +79,61 @@ def DrawingGrid(InputGrid, Window, OuterSquareSize, InnerSquareSize, Black, Blue
             pygame.draw.rect(Window, White, (InputGrid[CurrentSquare][1][0], InputGrid[CurrentSquare][1][1], InnerSquareSize, InnerSquareSize), 0)
         y += 1
 
-def FirstPlayerSelector():
-    RandomNumber = random.randint(1, 2)
-    if RandomNumber == 1:
-        FirstPlayer = "Red"
-    else:
-        FirstPlayer = "Blue"
-    return FirstPlayer
+def DrawMovements(Window, GridDimensions, TextFont, BluePlayerMovements, RedPlayerMovements, Blue, Red, Black):
+    BluePlayerScoreText = TextFont.render(str(BluePlayerMovements), False, Blue)
+    RedPlayerScoreText = TextFont.render(str(RedPlayerMovements), False, Red)
+    BlueScoreWidth = BluePlayerScoreText.get_width()
+    RedScoreWidth = RedPlayerScoreText.get_width()
+    ScreenWidth = Window.get_width()
+    ScreenHeight = Window.get_height()
+    ScreenPadding = (ScreenWidth - GridDimensions[0]) / 2
+    BlueScoreXPosition = (ScreenPadding - BlueScoreWidth) / 2
+    RedScoreXPosition = (ScreenPadding + GridDimensions[0]) + ((ScreenPadding - RedScoreWidth) / 2)
+    TextHeight = BluePlayerScoreText.get_height()
+    ScoreYPosition = (ScreenHeight / 2) - (TextHeight / 2)
+    Window.blit(BluePlayerScoreText, (BlueScoreXPosition, ScoreYPosition))
+    Window.blit(RedPlayerScoreText, (RedScoreXPosition, ScoreYPosition))
 
-def TextfontCalculator(DimensionValues):
-    FontSizeDictionary = {}
-    FontSizeDictionary["TitleFontSize"] = int(DimensionValues[1] * 0.16)
-    while (DimensionValues[0] / FontSizeDictionary["TitleFontSize"]) < 12:
-        print FontSizeDictionary["TitleFontSize"]
-        FontSizeDictionary["TitleFontSize"] -= 1
-    FontSizeDictionary["HeaderFontSize"] = int(DimensionValues[1] * 0.10)
-    while (DimensionValues[0] / FontSizeDictionary["HeaderFontSize"]) < 24:
-        FontSizeDictionary["HeaderFontSize"] -= 1
-    FontSizeDictionary["BodyFontSize"] = int(DimensionValues[1] * 0.05)
-    while (DimensionValues[0] / FontSizeDictionary["BodyFontSize"]) < 35:
-        FontSizeDictionary["BodyFontSize"] -= 1
-    print FontSizeDictionary
-    return FontSizeDictionary
+def DrawScreen(InputGrid, Window, WindowDimensions, GridDimensions, OuterSquareSize, InnerSquareSize, TextFont, BluePlayerMovements, RedPlayerMovements, Blue, Red, White, Black):
+    pygame.draw.rect(Window, Black, (0, 0, WindowDimensions[0], WindowDimensions[1]), 0)
+    DrawingGrid(InputGrid, Window, OuterSquareSize, InnerSquareSize, Black, Blue, Red, White)
+    DrawMovements(Window, GridDimensions, TextFont, BluePlayerMovements, RedPlayerMovements, Blue, Red, Black)
+    pygame.display.update()
+
+def GameTitle(Window, WindowDimensions, TextFont, White, Black):
+    while True:
+        pygame.draw.rect(Window, Black, (0, 0, WindowDimensions[0], WindowDimensions[1]), 0)
+        Title = TextFont.render("ROGUE HUNTER", False, White)
+        TextWidth = Title.get_width()
+        TextHeight = Title.get_height()
+        TitleXPosition = (WindowDimensions[0] - TextWidth) / 2
+        TitleYPosition = (WindowDimensions[1] / 2) - (TextHeight / 2)
+        Window.blit(Title, (TitleXPosition, TitleYPosition))
+        pygame.display.update()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                Quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == K_ESCAPE:
+                    Quit()
+                elif event.key == K_f:
+                    Fullscreen(Window, WindowDimensions)
+                else:
+                    return
+
+def TurnChange(Window, TextFont, CurrentPlayer, Blue, Red):
+    ScreenWidth = Window.get_width()
+    ScreenHeight = Window.get_height()
+    if CurrentPlayer == 'Blue':
+        CurrentPlayerColour = Blue
+    else:
+        CurrentPlayerColour = Red
+    TurnChangeText = TextFont.render(CurrentPlayer + " Player Turn", False, CurrentPlayerColour)
+    TextWidth = TurnChangeText.get_width()
+    TextHeight = TurnChangeText.get_height()
+    TextPosition = ((ScreenWidth - TextWidth) / 2, (ScreenHeight / 2) - (TextHeight / 2))
+    Window.blit(TurnChangeText, TextPosition)
+    pygame.display.update()
 
 def GameOver(Window, TextFont, CurrentPlayer, Blue, Red):
     ScreenWidth = Window.get_width()
@@ -102,60 +158,6 @@ def GameOver(Window, TextFont, CurrentPlayer, Blue, Red):
     for event in pygame.event.get():
         if event.type == pygame.KEYDOWN:
             Quit()
-
-def TurnChange(Window, TextFont, CurrentPlayer, Blue, Red):
-    ScreenWidth = Window.get_width()
-    ScreenHeight = Window.get_height()
-    if CurrentPlayer == 'Blue':
-        CurrentPlayerColour = Blue
-    else:
-        CurrentPlayerColour = Red
-    TurnChangeText = TextFont.render(CurrentPlayer + " Player Turn", False, CurrentPlayerColour)
-    TextWidth = TurnChangeText.get_width()
-    TextHeight = TurnChangeText.get_height()
-    TextPosition = ((ScreenWidth - TextWidth) / 2, (ScreenHeight / 2) - (TextHeight / 2))
-    Window.blit(TurnChangeText, TextPosition)
-    pygame.display.update()
-
-def DrawMovements(Window, GridDimensions, TextFont, BluePlayerMovements, RedPlayerMovements, Blue, Red, Black):
-    BluePlayerScoreText = TextFont.render(str(BluePlayerMovements), False, Blue)
-    RedPlayerScoreText = TextFont.render(str(RedPlayerMovements), False, Red)
-    BlueScoreWidth = BluePlayerScoreText.get_width()
-    RedScoreWidth = RedPlayerScoreText.get_width()
-    ScreenWidth = Window.get_width()
-    ScreenHeight = Window.get_height()
-    ScreenPadding = (ScreenWidth - GridDimensions[0]) / 2
-    BlueScoreXPosition = (ScreenPadding - BlueScoreWidth) / 2
-    RedScoreXPosition = (ScreenPadding + GridDimensions[0]) + ((ScreenPadding - RedScoreWidth) / 2)
-    TextHeight = BluePlayerScoreText.get_height()
-    ScoreYPosition = (ScreenHeight / 2) - (TextHeight / 2)
-    Window.blit(BluePlayerScoreText, (BlueScoreXPosition, ScoreYPosition))
-    Window.blit(RedPlayerScoreText, (RedScoreXPosition, ScoreYPosition))
-
-def DrawScreen(InputGrid, Window, WindowDimensions, GridDimensions, OuterSquareSize, InnerSquareSize, TextFont, BluePlayerMovements, RedPlayerMovements, Blue, Red, White, Black):
-    pygame.draw.rect(Window, Black, (0, 0, WindowDimensions[0], WindowDimensions[1]), 0)
-    DrawingGrid(InputGrid, Window, OuterSquareSize, InnerSquareSize, Black, Blue, Red, White)
-    DrawMovements(Window, GridDimensions, TextFont, BluePlayerMovements, RedPlayerMovements, Blue, Red, Black)
-    pygame.display.update()
-
-def GameTitle(Window, WindowDimensions, TextFont, White, Black):
-    pygame.draw.rect(Window, Black, (0, 0, WindowDimensions[0], WindowDimensions[1]), 0)
-    Title = TextFont.render("ROGUE HUNTER", False, White)
-    TextWidth = Title.get_width()
-    TextHeight = Title.get_height()
-    TitleXPosition = (WindowDimensions[0] - TextWidth) / 2
-    TitleYPosition = (WindowDimensions[1] / 2) - (TextHeight / 2)
-    Window.blit(Title, (TitleXPosition, TitleYPosition))
-    pygame.display.update()
-    pygame.event.clear()
-    pygame.event.wait()
-    for event in pygame.event.get():
-        if event.type == pygame.KEYDOWN:
-            if event.key == K_f:
-                Fullscreen(Window, WindowDimensions)
-                GameTitle(Window, WindowDimensions, TextFont, White, Black)
-            else:
-                return
 
 def Fullscreen (Window, WindowDimensions):
     flags = Window.get_flags()
