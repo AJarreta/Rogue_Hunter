@@ -45,19 +45,26 @@ def FirstPlayerSelector():
     return FirstPlayer
 
 def TextfontCalculator(DimensionValues):
-    FontSizeDictionary = {}
-    FontSizeDictionary["TitleFontSize"] = int((DimensionValues[1] * 0.25) * 0.75)
-    while (DimensionValues[0] / FontSizeDictionary["TitleFontSize"]) < 10:
-        print FontSizeDictionary["TitleFontSize"]
-        FontSizeDictionary["TitleFontSize"] -= 1
-    FontSizeDictionary["HeaderFontSize"] = int(DimensionValues[1] * 0.10)
-    while (DimensionValues[0] / FontSizeDictionary["HeaderFontSize"]) < 24:
-        FontSizeDictionary["HeaderFontSize"] -= 1
-    FontSizeDictionary["BodyFontSize"] = int(DimensionValues[1] * 0.05)
-    while (DimensionValues[0] / FontSizeDictionary["BodyFontSize"]) < 35:
-        FontSizeDictionary["BodyFontSize"] -= 1
-    print FontSizeDictionary
-    return FontSizeDictionary
+    FontDictionary = {}
+    TitleFontSize = int((DimensionValues[1] * 0.25) * 0.75)
+    while (DimensionValues[0] / TitleFontSize) < 10:
+        print TitleFontSize
+        TitleFontSize -= 1
+    FontDictionary["TitleFont"] = pygame.font.SysFont('visitortt1brk', TitleFontSize)
+    NumberFontSize = int((DimensionValues[1] * 0.20) * 0.75)
+    while (DimensionValues[0] / (NumberFontSize * 1.33)) < 10:
+        NumberFontSize -= 1
+    FontDictionary["NumberFont"] = pygame.font.SysFont('visitortt1brk', NumberFontSize)
+    HeaderFontSize = int((DimensionValues[1] * 0.10) * 0.75)
+    while (DimensionValues[0] / (HeaderFontSize * 1.33)) < 25:
+        HeaderFontSize -= 1
+    FontDictionary["HeaderFont"] = pygame.font.SysFont('visitortt1brk', HeaderFontSize)
+    BodyFontSize = int((DimensionValues[1] * 0.05) * 0.75)
+    while (DimensionValues[0] / (BodyFontSize * 1.33)) < 35:
+        BodyFontSize -= 1
+    FontDictionary["BodyFont"] = pygame.font.SysFont('visitortt1brk', BodyFontSize)
+    print FontDictionary
+    return FontDictionary
 
 def DrawingGrid(InputGrid, Window, OuterSquareSize, InnerSquareSize, Black, Blue, Red, White):
     x = 0
@@ -159,6 +166,9 @@ def GameOver(Window, TextFont, CurrentPlayer, Blue, Red):
         if event.type == pygame.KEYDOWN:
             Quit()
 
+def GameInstructionsScreen(Window, FontDictionary):
+    pass
+
 def Fullscreen (Window, WindowDimensions):
     flags = Window.get_flags()
     print flags
@@ -175,7 +185,7 @@ def Quit():
 def main():
     pygame.init()
     pygame.font.init()
-    FontSizeList = TextfontCalculator(WindowDimensions)
+    FontList = TextfontCalculator(WindowDimensions)
     PlainTextFont = pygame.font.SysFont('visitortt1brk', 50)
     HeaderFont = pygame.font.SysFont('visitortt1brk', 75)
     NumberFont = pygame. font.SysFont('visitortt1brk', 100)
@@ -188,7 +198,7 @@ def main():
     NextTurnSwitch = False
     pygame.display.set_caption('Rogue Hunter')
     ROGUE_HUNTERWindow = pygame.display.set_mode(WindowDimensions)
-    GameTitle(ROGUE_HUNTERWindow, WindowDimensions, TitleFont, BaseWhite, BaseBlack) 
+    GameTitle(ROGUE_HUNTERWindow, WindowDimensions, FontList["TitleFont"], BaseWhite, BaseBlack) 
     DrawScreen(PlayingGrid, ROGUE_HUNTERWindow, WindowDimensions, GridDimensions, OuterSquareSize, InnerSquareSize, NumberFont, BlueMovements, RedMovements, BaseBlue, BaseRed, BaseWhite, BaseBlack)
     while True:
         if CurrentPlayer == 'Blue':
@@ -204,7 +214,10 @@ def main():
                             Fullscreen(ROGUE_HUNTERWindow, WindowDimensions)
                             DrawScreen(PlayingGrid, ROGUE_HUNTERWindow, WindowDimensions, GridDimensions, OuterSquareSize, InnerSquareSize, NumberFont, BlueMovements, RedMovements, BaseBlue, BaseRed, BaseWhite, BaseBlack)
                         elif event.key == pygame.K_RETURN:
-                            NextTurnSwitch = True
+                            if CurrentTurnMovements == 0:
+                                pass
+                            else:
+                                NextTurnSwitch = True
                         elif event.key == pygame.K_UP or event.key == pygame.K_w:
                             if CurrentBluePlayerPosition[1] > 0:
                                 PlayingGrid[str(CurrentBluePlayerPosition)][2] = 0
@@ -261,7 +274,10 @@ def main():
                             Fullscreen(ROGUE_HUNTERWindow, WindowDimensions)
                             DrawScreen(PlayingGrid, ROGUE_HUNTERWindow, WindowDimensions, GridDimensions, OuterSquareSize, InnerSquareSize, NumberFont, BlueMovements, RedMovements, BaseBlue, BaseRed, BaseWhite, BaseBlack)
                         elif event.key == pygame.K_RETURN:
-                            NextTurnSwitch = True
+                            if CurrentTurnMovements == 0:
+                                pass
+                            else:
+                                NextTurnSwitch = True
                         elif event.key == pygame.K_UP or event.key == pygame.K_w:
                             if CurrentRedPlayerPosition[1] > 0:
                                 PlayingGrid[str(CurrentRedPlayerPosition)][2] = 0
