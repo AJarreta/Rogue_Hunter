@@ -46,23 +46,23 @@ def FirstPlayerSelector():
 
 def TextfontCalculator(DimensionValues):
     FontDictionary = {}
-    TitleFontSize = int((DimensionValues[1] * 0.25) * 0.75)
-    while (DimensionValues[0] / TitleFontSize) < 10:
+    TitleFontSize = int(DimensionValues[1] * 0.25)
+    while (DimensionValues[0] / TitleFontSize) < 8:
         print TitleFontSize
         TitleFontSize -= 1
-    FontDictionary["TitleFont"] = pygame.font.SysFont('visitortt1brk', TitleFontSize)
-    NumberFontSize = int((DimensionValues[1] * 0.20) * 0.75)
-    while (DimensionValues[0] / (NumberFontSize * 1.33)) < 10:
+    FontDictionary["TitleFont"] = TitleFontSize, pygame.font.SysFont('visitortt1brk', TitleFontSize)
+    NumberFontSize = int(DimensionValues[1] * 0.20)
+    while (DimensionValues[0] / (NumberFontSize)) < 8:
         NumberFontSize -= 1
-    FontDictionary["NumberFont"] = pygame.font.SysFont('visitortt1brk', NumberFontSize)
-    HeaderFontSize = int((DimensionValues[1] * 0.10) * 0.75)
-    while (DimensionValues[0] / (HeaderFontSize * 1.33)) < 25:
+    FontDictionary["NumberFont"] = NumberFontSize, pygame.font.SysFont('visitortt1brk', NumberFontSize)
+    HeaderFontSize = int(DimensionValues[1] * 0.10)
+    while (DimensionValues[0] / (HeaderFontSize)) < 15:
         HeaderFontSize -= 1
-    FontDictionary["HeaderFont"] = pygame.font.SysFont('visitortt1brk', HeaderFontSize)
+    FontDictionary["HeaderFont"] = HeaderFontSize, pygame.font.SysFont('visitortt1brk', HeaderFontSize)
     BodyFontSize = int((DimensionValues[1] * 0.05) * 0.75)
-    while (DimensionValues[0] / (BodyFontSize * 1.33)) < 35:
+    while (DimensionValues[0] / (BodyFontSize)) < 25:
         BodyFontSize -= 1
-    FontDictionary["BodyFont"] = pygame.font.SysFont('visitortt1brk', BodyFontSize)
+    FontDictionary["BodyFont"] = BodyFontSize, pygame.font.SysFont('visitortt1brk', BodyFontSize)
     print FontDictionary
     return FontDictionary
 
@@ -128,14 +128,14 @@ def GameTitle(Window, WindowDimensions, TextFont, White, Black):
                 else:
                     return
 
-def TurnChange(Window, TextFont, CurrentPlayer, Blue, Red):
+def TurnChange(Window, FontDictionary, CurrentPlayer, Blue, Red):
     ScreenWidth = Window.get_width()
     ScreenHeight = Window.get_height()
     if CurrentPlayer == 'Blue':
         CurrentPlayerColour = Blue
     else:
         CurrentPlayerColour = Red
-    TurnChangeText = TextFont.render(CurrentPlayer + " Player Turn", False, CurrentPlayerColour)
+    TurnChangeText = FontDictionary["BodyFont"][1].render(CurrentPlayer + " Player Turn", False, CurrentPlayerColour)
     TextWidth = TurnChangeText.get_width()
     TextHeight = TurnChangeText.get_height()
     TextPosition = ((ScreenWidth - TextWidth) / 2, (ScreenHeight / 2) - (TextHeight / 2))
@@ -166,8 +166,27 @@ def GameOver(Window, TextFont, CurrentPlayer, Blue, Red):
         if event.type == pygame.KEYDOWN:
             Quit()
 
-def GameInstructionsScreen(Window, FontDictionary):
-    pass
+def GameInstructionsScreen(Window, FontDictionary, BaseWhite, BaseBlack):
+    while True:
+        pygame.draw.rect(Window, BaseBlack, (0, 0, WindowDimensions[0], WindowDimensions[1]), 0)
+        WindowHeight = Window.get_height()
+        WindowWidth = Window.get_width()
+        InstructionsHeader = FontDictionary["HeaderFont"][1].render('HOW TO PLAY:', False, BaseWhite)
+        HeaderWidth = InstructionsHeader.get_width()
+        HeaderHeight = InstructionsHeader.get_height()
+        HeaderPosition = ((WindowWidth - HeaderWidth) / 2, ((WindowHeight * 0.2) - HeaderHeight) / 2)
+        Window.blit(InstructionsHeader, HeaderPosition)
+        pygame.display.update()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                Quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == K_ESCAPE:
+                    Quit()
+                elif event.key == K_f:
+                    Fullscreen(Window, WindowDimensions)
+                else:
+                    return
 
 def Fullscreen (Window, WindowDimensions):
     flags = Window.get_flags()
@@ -198,7 +217,8 @@ def main():
     NextTurnSwitch = False
     pygame.display.set_caption('Rogue Hunter')
     ROGUE_HUNTERWindow = pygame.display.set_mode(WindowDimensions)
-    GameTitle(ROGUE_HUNTERWindow, WindowDimensions, FontList["TitleFont"], BaseWhite, BaseBlack) 
+    GameTitle(ROGUE_HUNTERWindow, WindowDimensions, FontList["TitleFont"][1], BaseWhite, BaseBlack)
+    GameInstructionsScreen(ROGUE_HUNTERWindow, FontList, BaseWhite, BaseBlack)
     DrawScreen(PlayingGrid, ROGUE_HUNTERWindow, WindowDimensions, GridDimensions, OuterSquareSize, InnerSquareSize, NumberFont, BlueMovements, RedMovements, BaseBlue, BaseRed, BaseWhite, BaseBlack)
     while True:
         if CurrentPlayer == 'Blue':
