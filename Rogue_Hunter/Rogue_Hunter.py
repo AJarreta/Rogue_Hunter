@@ -108,13 +108,13 @@ def DrawScreen(InputGrid, Window, WindowDimensions, GridDimensions, OuterSquareS
     pygame.display.update()
 
 def GameTitle(Window, WindowDimensions, TextFont, White, Black):
+    Title = TextFont.render("ROGUE HUNTER", False, White)
+    TextWidth = Title.get_width()
+    TextHeight = Title.get_height()
+    TitleXPosition = (WindowDimensions[0] - TextWidth) / 2
+    TitleYPosition = (WindowDimensions[1] / 2) - (TextHeight / 2)
     while True:
         pygame.draw.rect(Window, Black, (0, 0, WindowDimensions[0], WindowDimensions[1]), 0)
-        Title = TextFont.render("ROGUE HUNTER", False, White)
-        TextWidth = Title.get_width()
-        TextHeight = Title.get_height()
-        TitleXPosition = (WindowDimensions[0] - TextWidth) / 2
-        TitleYPosition = (WindowDimensions[1] / 2) - (TextHeight / 2)
         Window.blit(Title, (TitleXPosition, TitleYPosition))
         pygame.display.update()
         for event in pygame.event.get():
@@ -167,15 +167,46 @@ def GameOver(Window, TextFont, CurrentPlayer, Blue, Red):
             Quit()
 
 def GameInstructionsScreen(Window, FontDictionary, BaseWhite, BaseBlack):
+    WindowHeight = Window.get_height()
+    WindowWidth = Window.get_width()
+    HeaderX =  WindowHeight * 0.15
+    BodyX = WindowHeight * 0.45
+    BindingsX = WindowHeight * 0.25
+    InstructionsHeader = FontDictionary["HeaderFont"][1].render('HOW TO PLAY:', False, BaseWhite)
+    HeaderWidth = InstructionsHeader.get_width()
+    HeaderHeight = InstructionsHeader.get_height()
+    HeaderPosition = ((WindowWidth - HeaderWidth) / 2, (HeaderX - HeaderHeight) / 2)
+    InstructionsXPosition = {}
+    InstuctionsYPosition = WindowWidth * 0.1
+    Position = copy.deepcopy(HeaderX)
+    LineGap = ((BodyX - (FontDictionary["BodyFont"][0] * 7)) / 6)
+    print LineGap
+    for line in range(7):
+        InstructionsXPosition[line] = Position
+        Position += FontDictionary["BodyFont"][0]
+        Position += LineGap
+        print Position
+    FirstLine = FontDictionary["BodyFont"][1].render("1. There are two players: Red and Blue.", False, BaseWhite)
+    SecondLine = FontDictionary["BodyFont"][1].render("2. Each player has to catch the other player.", False, BaseWhite)
+    ThirdLine = FontDictionary["BodyFont"][1].render("3. Each player has 100 movements.", False, BaseWhite)
+    FourthLine = FontDictionary["BodyFont"][1].render("4. Each player can spend up to 10 movements per turn.", False, BaseWhite)
+    FifthLine = FontDictionary["BodyFont"][1].render("5. No player can pass the turn without moving.", False, BaseWhite)
+    SixthLine = FontDictionary["BodyFont"][1].render("6. The first player is chosen randomly.", False, BaseWhite)
+    SeventhLine = FontDictionary["BodyFont"][1].render("7. If both players run out of movements, nobody wins.", False, BaseWhite)
+
+        
+        
+    
     while True:
         pygame.draw.rect(Window, BaseBlack, (0, 0, WindowDimensions[0], WindowDimensions[1]), 0)
-        WindowHeight = Window.get_height()
-        WindowWidth = Window.get_width()
-        InstructionsHeader = FontDictionary["HeaderFont"][1].render('HOW TO PLAY:', False, BaseWhite)
-        HeaderWidth = InstructionsHeader.get_width()
-        HeaderHeight = InstructionsHeader.get_height()
-        HeaderPosition = ((WindowWidth - HeaderWidth) / 2, ((WindowHeight * 0.2) - HeaderHeight) / 2)
         Window.blit(InstructionsHeader, HeaderPosition)
+        Window.blit(FirstLine, (InstuctionsYPosition, InstructionsXPosition[0]))
+        Window.blit(SecondLine, (InstuctionsYPosition, InstructionsXPosition[1]))
+        Window.blit(ThirdLine, (InstuctionsYPosition, InstructionsXPosition[2]))
+        Window.blit(FourthLine, (InstuctionsYPosition, InstructionsXPosition[3]))
+        Window.blit(FifthLine, (InstuctionsYPosition, InstructionsXPosition[4]))
+        Window.blit(SixthLine, (InstuctionsYPosition, InstructionsXPosition[5]))
+        Window.blit(SeventhLine, (InstuctionsYPosition, InstructionsXPosition[6]))
         pygame.display.update()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
