@@ -109,6 +109,7 @@ def DrawScreen(InputGrid, Window, WindowDimensions, GridDimensions, OuterSquareS
 
 def GameTitle(Window, WindowDimensions, TextFont, White, Black):
     Title = TextFont.render("ROGUE HUNTER", False, White)
+    #Version
     TextWidth = Title.get_width()
     TextHeight = Title.get_height()
     TitleXPosition = (WindowDimensions[0] - TextWidth) / 2
@@ -172,20 +173,8 @@ def GameInstructionsScreen(Window, FontDictionary, BaseWhite, BaseBlack):
     HeaderX =  WindowHeight * 0.15
     BodyX = WindowHeight * 0.45
     BindingsX = WindowHeight * 0.25
-    InstructionsHeader = FontDictionary["HeaderFont"][1].render('HOW TO PLAY:', False, BaseWhite)
-    HeaderWidth = InstructionsHeader.get_width()
-    HeaderHeight = InstructionsHeader.get_height()
-    HeaderPosition = ((WindowWidth - HeaderWidth) / 2, (HeaderX - HeaderHeight) / 2)
-    InstructionsXPosition = {}
-    InstuctionsYPosition = WindowWidth * 0.1
     Position = copy.deepcopy(HeaderX)
-    LineGap = ((BodyX - (FontDictionary["BodyFont"][0] * 7)) / 6)
-    print LineGap
-    for line in range(7):
-        InstructionsXPosition[line] = Position
-        Position += FontDictionary["BodyFont"][0]
-        Position += LineGap
-        print Position
+    InstructionsHeader = FontDictionary["HeaderFont"][1].render('HOW TO PLAY:', False, BaseWhite)
     FirstLine = FontDictionary["BodyFont"][1].render("1. There are two players: Red and Blue.", False, BaseWhite)
     SecondLine = FontDictionary["BodyFont"][1].render("2. Each player has to catch the other player.", False, BaseWhite)
     ThirdLine = FontDictionary["BodyFont"][1].render("3. Each player has 100 movements.", False, BaseWhite)
@@ -193,20 +182,67 @@ def GameInstructionsScreen(Window, FontDictionary, BaseWhite, BaseBlack):
     FifthLine = FontDictionary["BodyFont"][1].render("5. No player can pass the turn without moving.", False, BaseWhite)
     SixthLine = FontDictionary["BodyFont"][1].render("6. The first player is chosen randomly.", False, BaseWhite)
     SeventhLine = FontDictionary["BodyFont"][1].render("7. If both players run out of movements, nobody wins.", False, BaseWhite)
-
-        
-        
-    
+    FirstBinding = FontDictionary["HeaderFont"][1].render('KEY BINDINGS', False, BaseWhite)
+    SecondBinding = FontDictionary["BodyFont"][1].render("W, S, A, D/ ARROW KEYS: Move", False, BaseWhite)
+    ThirddBinding = FontDictionary["BodyFont"][1].render("ENTER: End turn", False, BaseWhite)
+    FourthBinding = FontDictionary["BodyFont"][1].render("F: Fullscreen", False, BaseWhite)
+    FifthBinding = FontDictionary["BodyFont"][1].render("ESC: Quit", False, BaseWhite)
+    LastLine = FontDictionary["HeaderFont"][1].render('GOOD HUNT.', False, BaseWhite)
+    HeaderWidth = InstructionsHeader.get_width()
+    HeaderPosition = (WindowWidth - HeaderWidth) / 2, (HeaderX - FontDictionary["HeaderFont"][0]) / 2
+    InstructionsXPosition = {}
+    InstructionsYPosition = WindowWidth * 0.1
+    LineGap = ((BodyX - (FontDictionary["BodyFont"][0] * 7)) / 6)
+    for line in range(7):
+        InstructionsXPosition[line] = Position
+        Position += FontDictionary["BodyFont"][0]
+        Position += LineGap
+    BindingsXPosition = {}
+    BindingsYPosition = {}
+    FirstBindingWidth = FirstBinding.get_width()
+    SecondBindingWidth = SecondBinding.get_width()
+    ThirdBindingWidth = ThirddBinding.get_width()
+    FourthBindingWidth = FourthBinding.get_width()
+    FifthBindingWidth = FifthBinding.get_width()
+    BindingsFirstYGap = (WindowWidth - (SecondBindingWidth + ThirdBindingWidth)) / 3
+    BindingsSecondYGap = (WindowWidth - (FourthBindingWidth + FifthBindingWidth)) / 3
+    BindingsGap = (BindingsX - (FontDictionary["HeaderFont"][0] + FontDictionary["BodyFont"][0] * 2))
+    for line in range(3):
+        Position += BindingsGap
+        BindingsXPosition[line] = Position
+        if line == 0:
+            Position += FontDictionary["HeaderFont"][0]
+        else:
+            Position += FontDictionary["BodyFont"][0]
+    for item in range(5):
+        if item == 0:
+            BindingsYPosition[item] = (WindowWidth - FirstBindingWidth) / 2
+        elif item == 1:
+            BindingsYPosition[item] = BindingsFirstYGap
+        elif item == 2:
+            BindingsYPosition[item] = (BindingsFirstYGap * 2) + SecondBindingWidth
+        elif item == 3:
+            BindingsYPosition[item] = BindingsSecondYGap
+        elif item == 4:
+            BindingsYPosition[item] = (BindingsSecondYGap * 2) + FourthBindingWidth
+    LastLineWidth = LastLine.get_width()
+    LastLinePosition = (WindowWidth - LastLineWidth) / 2, WindowHeight * 0.9
     while True:
         pygame.draw.rect(Window, BaseBlack, (0, 0, WindowDimensions[0], WindowDimensions[1]), 0)
         Window.blit(InstructionsHeader, HeaderPosition)
-        Window.blit(FirstLine, (InstuctionsYPosition, InstructionsXPosition[0]))
-        Window.blit(SecondLine, (InstuctionsYPosition, InstructionsXPosition[1]))
-        Window.blit(ThirdLine, (InstuctionsYPosition, InstructionsXPosition[2]))
-        Window.blit(FourthLine, (InstuctionsYPosition, InstructionsXPosition[3]))
-        Window.blit(FifthLine, (InstuctionsYPosition, InstructionsXPosition[4]))
-        Window.blit(SixthLine, (InstuctionsYPosition, InstructionsXPosition[5]))
-        Window.blit(SeventhLine, (InstuctionsYPosition, InstructionsXPosition[6]))
+        Window.blit(FirstLine, (InstructionsYPosition, InstructionsXPosition[0]))
+        Window.blit(SecondLine, (InstructionsYPosition, InstructionsXPosition[1]))
+        Window.blit(ThirdLine, (InstructionsYPosition, InstructionsXPosition[2]))
+        Window.blit(FourthLine, (InstructionsYPosition, InstructionsXPosition[3]))
+        Window.blit(FifthLine, (InstructionsYPosition, InstructionsXPosition[4]))
+        Window.blit(SixthLine, (InstructionsYPosition, InstructionsXPosition[5]))
+        Window.blit(SeventhLine, (InstructionsYPosition, InstructionsXPosition[6]))
+        Window.blit(FirstBinding, (BindingsYPosition[0], BindingsXPosition[0]))
+        Window.blit(SecondBinding, (BindingsYPosition[1], BindingsXPosition[1]))
+        Window.blit(ThirddBinding, (BindingsYPosition[2], BindingsXPosition[2]))
+        Window.blit(FourthBinding, (BindingsYPosition[3], BindingsXPosition[3]))
+        Window.blit(FifthBinding,(BindingsYPosition[4], BindingsXPosition[4]))
+        Window.blit(LastLine, LastLinePosition)
         pygame.display.update()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -387,6 +423,7 @@ NumberOfColumns = 19
 NumberOfLines = 20
 MaxMovements = 10
 FPS = 30
+CurrentVersion = "v0.1"
 
 # COLOURS DEFINITION
 BaseBlack = (0, 0, 0)
