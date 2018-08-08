@@ -59,7 +59,7 @@ def TextfontCalculator(DimensionValues):
     while (DimensionValues[0] / (HeaderFontSize)) < 15:
         HeaderFontSize -= 1
     FontDictionary["HeaderFont"] = HeaderFontSize, pygame.font.SysFont('visitortt1brk', HeaderFontSize)
-    BodyFontSize = int((DimensionValues[1] * 0.05) * 0.75)
+    BodyFontSize = int(DimensionValues[1] * 0.05)
     while (DimensionValues[0] / (BodyFontSize)) < 25:
         BodyFontSize -= 1
     FontDictionary["BodyFont"] = BodyFontSize, pygame.font.SysFont('visitortt1brk', BodyFontSize)
@@ -107,16 +107,21 @@ def DrawScreen(InputGrid, Window, WindowDimensions, GridDimensions, OuterSquareS
     DrawMovements(Window, GridDimensions, TextFont, BluePlayerMovements, RedPlayerMovements, Blue, Red, Black)
     pygame.display.update()
 
-def GameTitle(Window, WindowDimensions, TextFont, White, Black):
-    Title = TextFont.render("ROGUE HUNTER", False, White)
-    #Version
+def GameTitle(Window, WindowDimensions, FontDictionary, CurrentVersion, White, Black):
+    Title = FontDictionary["TitleFont"][1].render("ROGUE HUNTER", False, White)
+    Version = FontDictionary["BodyFont"][1].render(CurrentVersion, False, White)
     TextWidth = Title.get_width()
     TextHeight = Title.get_height()
+    VersionHeight = Version.get_height()
+    VersionWidth = Version.get_width()
     TitleXPosition = (WindowDimensions[0] - TextWidth) / 2
     TitleYPosition = (WindowDimensions[1] / 2) - (TextHeight / 2)
+    VersionXPosition = (WindowDimensions[0] - VersionWidth) / 2
+    VersionYPosition = TitleYPosition + TextHeight 
     while True:
         pygame.draw.rect(Window, Black, (0, 0, WindowDimensions[0], WindowDimensions[1]), 0)
         Window.blit(Title, (TitleXPosition, TitleYPosition))
+        Window.blit(Version, (VersionXPosition, VersionYPosition))
         pygame.display.update()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -239,9 +244,9 @@ def GameInstructionsScreen(Window, FontDictionary, BaseWhite, BaseBlack):
         Window.blit(SeventhLine, (InstructionsYPosition, InstructionsXPosition[6]))
         Window.blit(FirstBinding, (BindingsYPosition[0], BindingsXPosition[0]))
         Window.blit(SecondBinding, (BindingsYPosition[1], BindingsXPosition[1]))
-        Window.blit(ThirddBinding, (BindingsYPosition[2], BindingsXPosition[2]))
-        Window.blit(FourthBinding, (BindingsYPosition[3], BindingsXPosition[3]))
-        Window.blit(FifthBinding,(BindingsYPosition[4], BindingsXPosition[4]))
+        Window.blit(ThirddBinding, (BindingsYPosition[2], BindingsXPosition[1]))
+        Window.blit(FourthBinding, (BindingsYPosition[3], BindingsXPosition[2]))
+        Window.blit(FifthBinding,(BindingsYPosition[4], BindingsXPosition[2]))
         Window.blit(LastLine, LastLinePosition)
         pygame.display.update()
         for event in pygame.event.get():
@@ -284,7 +289,7 @@ def main():
     NextTurnSwitch = False
     pygame.display.set_caption('Rogue Hunter')
     ROGUE_HUNTERWindow = pygame.display.set_mode(WindowDimensions)
-    GameTitle(ROGUE_HUNTERWindow, WindowDimensions, FontList["TitleFont"][1], BaseWhite, BaseBlack)
+    GameTitle(ROGUE_HUNTERWindow, WindowDimensions, FontList, CurrentVersion, BaseWhite, BaseBlack)
     GameInstructionsScreen(ROGUE_HUNTERWindow, FontList, BaseWhite, BaseBlack)
     DrawScreen(PlayingGrid, ROGUE_HUNTERWindow, WindowDimensions, GridDimensions, OuterSquareSize, InnerSquareSize, NumberFont, BlueMovements, RedMovements, BaseBlue, BaseRed, BaseWhite, BaseBlack)
     while True:
