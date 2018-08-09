@@ -109,7 +109,7 @@ def DrawScreen(InputGrid, Window, WindowDimensions, GridDimensions, OuterSquareS
 
 def GameTitle(Window, WindowDimensions, FontDictionary, CurrentVersion, White, Black):
     Title = FontDictionary["TitleFont"][1].render("ROGUE HUNTER", False, White)
-    Version = FontDictionary["BodyFont"][1].render(CurrentVersion, False, White)
+    Version = FontDictionary["BodyFont"][1].render(CurrentVersion, False, Black)
     TextWidth = Title.get_width()
     TextHeight = Title.get_height()
     VersionHeight = Version.get_height()
@@ -148,23 +148,69 @@ def TurnChange(Window, FontDictionary, CurrentPlayer, Blue, Red):
     Window.blit(TurnChangeText, TextPosition)
     pygame.display.update()
 
-def GameOver(Window, TextFont, CurrentPlayer, Blue, Red):
+def GameOver(Window, FontList, Winner, Blue, Red, White):
     ScreenWidth = Window.get_width()
     ScreenHeight = Window.get_height()
-    if CurrentPlayer == 'Blue':
-        CurrentPlayerColour = Blue
+    if Winner == "Blue":
+        WinnerColour = Blue
+        FirstGameOverLine = FontList["BodyFont"][1].render('Game Over! Blue Player is the winner', False, WinnerColour)
+        SecondGameOverLine = TextFont.render('Press a key to continue', False, WinnerColour)
+        FirstLineWidth = FirstGameOverLine.get_width()
+        FirstLineHeight = FirstGameOverLine.get_height()
+        SecondLineWidth = SecondGameOverLine.get_width()
+        SecondLineWidth = SecondGameOverLine.get_width()
+        FirstLinePosition = ((ScreenWidth - FirstLineWidth) / 2, (ScreenHeight / 2) - (TextHeight - 2))
+        SecondLinePosition = ((ScreenWidth - SecondLineWidth) / 2, (ScreenHeight / 2) + (TextHeight + 2))
+        Window.blit(FirstGameOverLine, FirstLinePosition)
+        Window.blit(SecondGameOverLine, SecondLinePosition)
+        pygame.display.update()
+        pygame.event.clear()
+        pygame.event.wait()
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                Quit()
+    elif Winner == "Red":
+        WinnerColour == Red
+        FirstGameOverLine = FontList["BodyFont"][1].render('Game Over! Red Player is the winner', False, WinnerColour)
+        SecondGameOverLine = TextFont.render('Press a key to continue', False, WinnerColour)
+        FirstLineWidth = FirstGameOverLine.get_width()
+        TextHeight = FirstGameOverLine.get_height()
+        SecondLineWidth = SecondGameOverLine.get_width()
+        FirstLinePosition = ((ScreenWidth - FirstLineWidth) / 2, (ScreenHeight / 2) - (TextHeight - 2))
+        SecondLinePosition = ((ScreenWidth - SecondLineWidth) / 2, (ScreenHeight / 2) + (TextHeight + 2))
+        Window.blit(FirstGameOverLine, FirstLinePosition)
+        Window.blit(SecondGameOverLine, SecondLinePosition)
+        pygame.display.update()
+        pygame.event.clear()
+        pygame.event.wait()
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                Quit()
     else:
-        CurrentPlayerColour = Red
-    FirstGameOverLine = TextFont.render('Game Over! ' + CurrentPlayer + ' Player is the winner', False, CurrentPlayerColour)
-    TextWidth = FirstGameOverLine.get_width()
-    TextHeight = FirstGameOverLine.get_height()
-    FirstLinePosition = ((ScreenWidth - TextWidth) / 2, (ScreenHeight / 2) - (TextHeight - 2))
-    Window.blit(FirstGameOverLine, FirstLinePosition)
-    SecondGameOverLine = TextFont.render('Press a key to continue', False, CurrentPlayerColour)
-    TextWidth = SecondGameOverLine.get_width()
-    TextHeight = SecondGameOverLine.get_height()
-    SecondLinePosition = ((ScreenWidth - TextWidth) / 2, (ScreenHeight / 2) + (TextHeight + 2))
-    Window.blit(SecondGameOverLine, SecondLinePosition)
+        WinnerColour == White
+        FirstGameOverLine = FontList["BodyFont"][1].render('Both players run out of movements! Nobody won!', False, WinnerColour)
+        SecondGameOverLine = TextFont.render('Press a key to continue', False, WinnerColour)
+        FirstLineWidth = FirstGameOverLine.get_width()
+        TextHeight = FirstGameOverLine.get_height()
+        SecondLineWidth = SecondGameOverLine.get_width()
+        FirstLinePosition = ((ScreenWidth - FirstLineWidth) / 2, (ScreenHeight / 2) - (TextHeight - 2))
+        SecondLinePosition = ((ScreenWidth - SecondLineWidth) / 2, (ScreenHeight / 2) + (TextHeight + 2))
+        Window.blit(FirstGameOverLine, FirstLinePosition)
+        Window.blit(SecondGameOverLine, SecondLinePosition)
+        pygame.display.update()
+        pygame.event.clear()
+        pygame.event.wait()
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                Quit()
+
+
+
+
+
+
+
+
     pygame.display.update()
     pygame.event.clear()
     pygame.event.wait()
@@ -294,7 +340,7 @@ def main():
     DrawScreen(PlayingGrid, ROGUE_HUNTERWindow, WindowDimensions, GridDimensions, OuterSquareSize, InnerSquareSize, NumberFont, BlueMovements, RedMovements, BaseBlue, BaseRed, BaseWhite, BaseBlack)
     while True:
         if CurrentPlayer == 'Blue':
-            TurnChange(ROGUE_HUNTERWindow, PlainTextFont, CurrentPlayer, BaseBlue, BaseRed)
+            TurnChange(ROGUE_HUNTERWindow, FontList, CurrentPlayer, BaseBlue, BaseRed)
             while True:
                 for event in pygame.event.get():
                     if event.type == QUIT:
@@ -348,13 +394,16 @@ def main():
                     CurrentTurnMovements = 0
                     break
                 if CurrentBluePlayerPosition == CurrentRedPlayerPosition:
+                    Winner = "Blue"
+                    GameOver(ROGUE_HUNTERWindow,
+                if BlueMovements == 0 and RedMovements == 0:
                     GameOver(ROGUE_HUNTERWindow, PlainTextFont, CurrentPlayer, BaseBlue, BaseRed)
                     pygame.event.clear()
                     pygame.event.wait()
                     if event.type == pygame.KEYDOWN:
                         Quit()
         elif CurrentPlayer == 'Red':
-            TurnChange(ROGUE_HUNTERWindow, PlainTextFont, CurrentPlayer, BaseBlue, BaseRed)
+            TurnChange(ROGUE_HUNTERWindow, FontList, CurrentPlayer, BaseBlue, BaseRed)
             while True:
                 for event in pygame.event.get():
                     if event.type == QUIT:
