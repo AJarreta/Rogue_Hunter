@@ -3,18 +3,23 @@ import math
 import random
 import pygame
 from pygame.locals import *
+from constants import *
 import win32api
 import copy
 
 # FUNCTIONS DEFINITIONS
+#
+# =====================
+# BACKEND FUNCTIONS:
+
 def GridConstructor(RedPosition, BluePosition, SquareSize, StartingPositionA, StartingPositionB):
     InputGrid = {}
     CurrentPositionA = copy.deepcopy(StartingPositionA)
     CurrentPositionB = copy.deepcopy(StartingPositionB)
     x = 0
-    for Column in range(NumberOfColumns):
+    for Column in range(NUMBER_OF_COLUMNS):
         y = 0
-        for Line in range(NumberOfLines):
+        for Line in range(NUMBER_OF_LINES):
             CurrentSquare = "[" + str(x) + ", " + str(y) + "]"
             if [x, y] == BluePosition:
                 InputGrid[CurrentSquare] = [copy.deepcopy(CurrentPositionA), copy.deepcopy(CurrentPositionB), 1]
@@ -66,6 +71,11 @@ def TextfontCalculator(DimensionValues):
     print FontDictionary
     return FontDictionary
 
+def WhiteGrid(InputGrid):
+    for item, value in InputGrid.items():
+        value[2] = 0
+        
+
 def DrawingGrid(InputGrid, Window, OuterSquareSize, InnerSquareSize, Black, Blue, Red, White):
     x = 0
     y = 0
@@ -86,9 +96,9 @@ def DrawingGrid(InputGrid, Window, OuterSquareSize, InnerSquareSize, Black, Blue
             pygame.draw.rect(Window, White, (InputGrid[CurrentSquare][1][0], InputGrid[CurrentSquare][1][1], InnerSquareSize, InnerSquareSize), 0)
         y += 1
 
-def DrawMovements(Window, GridDimensions, TextFont, BluePlayerMovements, RedPlayerMovements, Blue, Red, Black):
-    BluePlayerScoreText = TextFont.render(str(BluePlayerMovements), False, Blue)
-    RedPlayerScoreText = TextFont.render(str(RedPlayerMovements), False, Red)
+def DrawMovements(Window, GridDimensions, FontList, BluePlayerMovements, RedPlayerMovements, Blue, Red, Black):
+    BluePlayerScoreText = FontList["NumberFont"][1].render(str(BluePlayerMovements), False, Blue)
+    RedPlayerScoreText = FontList["NumberFont"][1].render(str(RedPlayerMovements), False, Red)
     BlueScoreWidth = BluePlayerScoreText.get_width()
     RedScoreWidth = RedPlayerScoreText.get_width()
     ScreenWidth = Window.get_width()
@@ -101,15 +111,15 @@ def DrawMovements(Window, GridDimensions, TextFont, BluePlayerMovements, RedPlay
     Window.blit(BluePlayerScoreText, (BlueScoreXPosition, ScoreYPosition))
     Window.blit(RedPlayerScoreText, (RedScoreXPosition, ScoreYPosition))
 
-def DrawScreen(InputGrid, Window, WindowDimensions, GridDimensions, OuterSquareSize, InnerSquareSize, TextFont, BluePlayerMovements, RedPlayerMovements, Blue, Red, White, Black):
+def DrawScreen(InputGrid, Window, WindowDimensions, GridDimensions, OuterSquareSize, InnerSquareSize, FontList, BluePlayerMovements, RedPlayerMovements, Blue, Red, White, Black):
     pygame.draw.rect(Window, Black, (0, 0, WindowDimensions[0], WindowDimensions[1]), 0)
     DrawingGrid(InputGrid, Window, OuterSquareSize, InnerSquareSize, Black, Blue, Red, White)
-    DrawMovements(Window, GridDimensions, TextFont, BluePlayerMovements, RedPlayerMovements, Blue, Red, Black)
+    DrawMovements(Window, GridDimensions, FontList, BluePlayerMovements, RedPlayerMovements, Blue, Red, Black)
     pygame.display.update()
 
 def GameTitle(Window, WindowDimensions, FontDictionary, CurrentVersion, White, Black):
     Title = FontDictionary["TitleFont"][1].render("ROGUE HUNTER", False, White)
-    Version = FontDictionary["BodyFont"][1].render(CurrentVersion, False, Black)
+    Version = FontDictionary["BodyFont"][1].render(CurrentVersion, False, White)
     TextWidth = Title.get_width()
     TextHeight = Title.get_height()
     VersionHeight = Version.get_height()
@@ -151,45 +161,35 @@ def TurnChange(Window, FontDictionary, CurrentPlayer, Blue, Red):
 def GameOver(Window, FontList, Winner, Blue, Red, White):
     ScreenWidth = Window.get_width()
     ScreenHeight = Window.get_height()
+    WinnerColour = 0
     if Winner == "Blue":
         WinnerColour = Blue
         FirstGameOverLine = FontList["BodyFont"][1].render('Game Over! Blue Player is the winner', False, WinnerColour)
-        SecondGameOverLine = TextFont.render('Press a key to continue', False, WinnerColour)
+        SecondGameOverLine = FontList["BodyFont"][1].render('Press a key to continue', False, WinnerColour)
         FirstLineWidth = FirstGameOverLine.get_width()
         FirstLineHeight = FirstGameOverLine.get_height()
         SecondLineWidth = SecondGameOverLine.get_width()
-        SecondLineWidth = SecondGameOverLine.get_width()
-        FirstLinePosition = ((ScreenWidth - FirstLineWidth) / 2, (ScreenHeight / 2) - (TextHeight - 2))
-        SecondLinePosition = ((ScreenWidth - SecondLineWidth) / 2, (ScreenHeight / 2) + (TextHeight + 2))
+        FirstLinePosition = ((ScreenWidth - FirstLineWidth) / 2, (ScreenHeight / 2) - (FirstLineHeight - 2))
+        SecondLinePosition = ((ScreenWidth - SecondLineWidth) / 2, (ScreenHeight / 2) + (FirstLineHeight + 2))
         Window.blit(FirstGameOverLine, FirstLinePosition)
         Window.blit(SecondGameOverLine, SecondLinePosition)
         pygame.display.update()
-        pygame.event.clear()
-        pygame.event.wait()
-        for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN:
-                Quit()
     elif Winner == "Red":
         WinnerColour == Red
         FirstGameOverLine = FontList["BodyFont"][1].render('Game Over! Red Player is the winner', False, WinnerColour)
-        SecondGameOverLine = TextFont.render('Press a key to continue', False, WinnerColour)
+        SecondGameOverLine = FontList["BodyFont"][1].render('Press a key to continue', False, WinnerColour)
         FirstLineWidth = FirstGameOverLine.get_width()
         TextHeight = FirstGameOverLine.get_height()
         SecondLineWidth = SecondGameOverLine.get_width()
-        FirstLinePosition = ((ScreenWidth - FirstLineWidth) / 2, (ScreenHeight / 2) - (TextHeight - 2))
-        SecondLinePosition = ((ScreenWidth - SecondLineWidth) / 2, (ScreenHeight / 2) + (TextHeight + 2))
+        FirstLinePosition = ((ScreenWidth - FirstLineWidth) / 2, (ScreenHeight / 2) - (FirstLineHeight - 2))
+        SecondLinePosition = ((ScreenWidth - SecondLineWidth) / 2, (ScreenHeight / 2) + (FirstLineHeight + 2))
         Window.blit(FirstGameOverLine, FirstLinePosition)
         Window.blit(SecondGameOverLine, SecondLinePosition)
         pygame.display.update()
-        pygame.event.clear()
-        pygame.event.wait()
-        for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN:
-                Quit()
     else:
         WinnerColour == White
         FirstGameOverLine = FontList["BodyFont"][1].render('Both players run out of movements! Nobody won!', False, WinnerColour)
-        SecondGameOverLine = TextFont.render('Press a key to continue', False, WinnerColour)
+        SecondGameOverLine = FontList["BodyFont"][1].render('Press a key to continue', False, WinnerColour)
         FirstLineWidth = FirstGameOverLine.get_width()
         TextHeight = FirstGameOverLine.get_height()
         SecondLineWidth = SecondGameOverLine.get_width()
@@ -198,47 +198,36 @@ def GameOver(Window, FontList, Winner, Blue, Red, White):
         Window.blit(FirstGameOverLine, FirstLinePosition)
         Window.blit(SecondGameOverLine, SecondLinePosition)
         pygame.display.update()
-        pygame.event.clear()
-        pygame.event.wait()
-        for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN:
-                Quit()
-
-
-
-
-
-
-
-
-    pygame.display.update()
-    pygame.event.clear()
-    pygame.event.wait()
     for event in pygame.event.get():
-        if event.type == pygame.KEYDOWN:
+        if event.type == pygame.QUIT:
             Quit()
+        if event.type == pygame.KEYDOWN:
+            if event.key == K_ESCAPE:
+                Quit()
+            else:
+                return
 
-def GameInstructionsScreen(Window, FontDictionary, BaseWhite, BaseBlack):
+def GameInstructionsScreen(Window, FontDictionary, White, Black):
     WindowHeight = Window.get_height()
     WindowWidth = Window.get_width()
     HeaderX =  WindowHeight * 0.15
     BodyX = WindowHeight * 0.45
     BindingsX = WindowHeight * 0.25
     Position = copy.deepcopy(HeaderX)
-    InstructionsHeader = FontDictionary["HeaderFont"][1].render('HOW TO PLAY:', False, BaseWhite)
-    FirstLine = FontDictionary["BodyFont"][1].render("1. There are two players: Red and Blue.", False, BaseWhite)
-    SecondLine = FontDictionary["BodyFont"][1].render("2. Each player has to catch the other player.", False, BaseWhite)
-    ThirdLine = FontDictionary["BodyFont"][1].render("3. Each player has 100 movements.", False, BaseWhite)
-    FourthLine = FontDictionary["BodyFont"][1].render("4. Each player can spend up to 10 movements per turn.", False, BaseWhite)
-    FifthLine = FontDictionary["BodyFont"][1].render("5. No player can pass the turn without moving.", False, BaseWhite)
-    SixthLine = FontDictionary["BodyFont"][1].render("6. The first player is chosen randomly.", False, BaseWhite)
-    SeventhLine = FontDictionary["BodyFont"][1].render("7. If both players run out of movements, nobody wins.", False, BaseWhite)
-    FirstBinding = FontDictionary["HeaderFont"][1].render('KEY BINDINGS', False, BaseWhite)
-    SecondBinding = FontDictionary["BodyFont"][1].render("W, S, A, D/ ARROW KEYS: Move", False, BaseWhite)
-    ThirddBinding = FontDictionary["BodyFont"][1].render("ENTER: End turn", False, BaseWhite)
-    FourthBinding = FontDictionary["BodyFont"][1].render("F: Fullscreen", False, BaseWhite)
-    FifthBinding = FontDictionary["BodyFont"][1].render("ESC: Quit", False, BaseWhite)
-    LastLine = FontDictionary["HeaderFont"][1].render('GOOD HUNT.', False, BaseWhite)
+    InstructionsHeader = FontDictionary["HeaderFont"][1].render('HOW TO PLAY:', False, White)
+    FirstLine = FontDictionary["BodyFont"][1].render("1. There are two players: Red and Blue.", False, White)
+    SecondLine = FontDictionary["BodyFont"][1].render("2. Each player has to catch the other player.", False, White)
+    ThirdLine = FontDictionary["BodyFont"][1].render("3. Each player has 100 movements.", False, White)
+    FourthLine = FontDictionary["BodyFont"][1].render("4. Each player can spend up to 10 movements per turn.", False, White)
+    FifthLine = FontDictionary["BodyFont"][1].render("5. No player can pass the turn without moving.", False, White)
+    SixthLine = FontDictionary["BodyFont"][1].render("6. The first player is chosen randomly.", False, White)
+    SeventhLine = FontDictionary["BodyFont"][1].render("7. If both players run out of movements, nobody wins.", False, White)
+    FirstBinding = FontDictionary["HeaderFont"][1].render('KEY BINDINGS', False, White)
+    SecondBinding = FontDictionary["BodyFont"][1].render("W, S, A, D/ ARROW KEYS: Move", False, White)
+    ThirddBinding = FontDictionary["BodyFont"][1].render("ENTER: End turn", False, White)
+    FourthBinding = FontDictionary["BodyFont"][1].render("F: Fullscreen", False, White)
+    FifthBinding = FontDictionary["BodyFont"][1].render("ESC: Quit", False, White)
+    LastLine = FontDictionary["HeaderFont"][1].render('GOOD HUNT.', False, White)
     HeaderWidth = InstructionsHeader.get_width()
     HeaderPosition = (WindowWidth - HeaderWidth) / 2, (HeaderX - FontDictionary["HeaderFont"][0]) / 2
     InstructionsXPosition = {}
@@ -279,7 +268,7 @@ def GameInstructionsScreen(Window, FontDictionary, BaseWhite, BaseBlack):
     LastLineWidth = LastLine.get_width()
     LastLinePosition = (WindowWidth - LastLineWidth) / 2, WindowHeight * 0.9
     while True:
-        pygame.draw.rect(Window, BaseBlack, (0, 0, WindowDimensions[0], WindowDimensions[1]), 0)
+        pygame.draw.rect(Window, Black, (0, 0, WindowDimensions[0], WindowDimensions[1]), 0)
         Window.blit(InstructionsHeader, HeaderPosition)
         Window.blit(FirstLine, (InstructionsYPosition, InstructionsXPosition[0]))
         Window.blit(SecondLine, (InstructionsYPosition, InstructionsXPosition[1]))
@@ -323,24 +312,19 @@ def main():
     pygame.init()
     pygame.font.init()
     FontList = TextfontCalculator(WindowDimensions)
-    PlainTextFont = pygame.font.SysFont('visitortt1brk', 50)
-    HeaderFont = pygame.font.SysFont('visitortt1brk', 75)
-    NumberFont = pygame. font.SysFont('visitortt1brk', 100)
-    TitleFont = pygame.font.SysFont('visitortt1brk', 150)
-    FPSClock = pygame.time.Clock()
     CurrentPlayer = FirstPlayerSelector()
-    RedMovements = 100
-    BlueMovements = 100
+    RedMovements = copy.deepcopy(STARTING_MOVEMENTS)
+    BlueMovements =  copy.deepcopy(STARTING_MOVEMENTS)
     CurrentTurnMovements = 0
     NextTurnSwitch = False
     pygame.display.set_caption('Rogue Hunter')
     ROGUE_HUNTERWindow = pygame.display.set_mode(WindowDimensions)
-    GameTitle(ROGUE_HUNTERWindow, WindowDimensions, FontList, CurrentVersion, BaseWhite, BaseBlack)
-    GameInstructionsScreen(ROGUE_HUNTERWindow, FontList, BaseWhite, BaseBlack)
-    DrawScreen(PlayingGrid, ROGUE_HUNTERWindow, WindowDimensions, GridDimensions, OuterSquareSize, InnerSquareSize, NumberFont, BlueMovements, RedMovements, BaseBlue, BaseRed, BaseWhite, BaseBlack)
+    GameTitle(ROGUE_HUNTERWindow, WindowDimensions, FontList, CURRENT_VERSION, BASE_WHITE, BASE_BLACK)
+    GameInstructionsScreen(ROGUE_HUNTERWindow, FontList, BASE_WHITE, BASE_BLACK)
+    DrawScreen(PlayingGrid, ROGUE_HUNTERWindow, WindowDimensions, GridDimensions, OuterSquareSize, InnerSquareSize, FontList, BlueMovements, RedMovements, BASE_BLUE, BASE_RED, BASE_WHITE, BASE_BLACK)
     while True:
         if CurrentPlayer == 'Blue':
-            TurnChange(ROGUE_HUNTERWindow, FontList, CurrentPlayer, BaseBlue, BaseRed)
+            TurnChange(ROGUE_HUNTERWindow, FontList, CurrentPlayer, BASE_BLUE, BASE_RED)
             while True:
                 for event in pygame.event.get():
                     if event.type == QUIT:
@@ -350,7 +334,7 @@ def main():
                             Quit()
                         elif event.key == pygame.K_f:
                             Fullscreen(ROGUE_HUNTERWindow, WindowDimensions)
-                            DrawScreen(PlayingGrid, ROGUE_HUNTERWindow, WindowDimensions, GridDimensions, OuterSquareSize, InnerSquareSize, NumberFont, BlueMovements, RedMovements, BaseBlue, BaseRed, BaseWhite, BaseBlack)
+                            DrawScreen(PlayingGrid, ROGUE_HUNTERWindow, WindowDimensions, GridDimensions, OuterSquareSize, InnerSquareSize, FontList, BlueMovements, RedMovements, BASE_BLUE, BASE_RED, BASE_WHITE, BASE_BLACK)
                         elif event.key == pygame.K_RETURN:
                             if CurrentTurnMovements == 0:
                                 pass
@@ -363,15 +347,15 @@ def main():
                                 PlayingGrid[str(CurrentBluePlayerPosition)][2] = 1
                                 CurrentTurnMovements += 1
                                 BlueMovements -= 1
-                                DrawScreen(PlayingGrid, ROGUE_HUNTERWindow, WindowDimensions, GridDimensions, OuterSquareSize, InnerSquareSize, NumberFont, BlueMovements, RedMovements, BaseBlue, BaseRed, BaseWhite, BaseBlack)
+                                DrawScreen(PlayingGrid, ROGUE_HUNTERWindow, WindowDimensions, GridDimensions, OuterSquareSize, InnerSquareSize, FontList, BlueMovements, RedMovements, BASE_BLUE, BASE_RED, BASE_WHITE, BASE_BLACK)
                         elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
-                            if CurrentBluePlayerPosition[1] < (NumberOfLines - 1):
+                            if CurrentBluePlayerPosition[1] < (NUMBER_OF_LINES - 1):
                                 PlayingGrid[str(CurrentBluePlayerPosition)][2] = 0
                                 CurrentBluePlayerPosition[1] += 1
                                 PlayingGrid[str(CurrentBluePlayerPosition)][2] = 1
                                 CurrentTurnMovements += 1
                                 BlueMovements -= 1
-                                DrawScreen(PlayingGrid, ROGUE_HUNTERWindow, WindowDimensions, GridDimensions, OuterSquareSize, InnerSquareSize, NumberFont, BlueMovements, RedMovements, BaseBlue, BaseRed, BaseWhite, BaseBlack)
+                                DrawScreen(PlayingGrid, ROGUE_HUNTERWindow, WindowDimensions, GridDimensions, OuterSquareSize, InnerSquareSize, FontList, BlueMovements, RedMovements, BASE_BLUE, BASE_RED, BASE_WHITE, BASE_BLACK)
                         elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
                             if CurrentBluePlayerPosition[0] > 0:
                                 PlayingGrid[str(CurrentBluePlayerPosition)][2] = 0
@@ -379,31 +363,33 @@ def main():
                                 PlayingGrid[str(CurrentBluePlayerPosition)][2] = 1
                                 CurrentTurnMovements += 1
                                 BlueMovements -= 1
-                                DrawScreen(PlayingGrid, ROGUE_HUNTERWindow, WindowDimensions, GridDimensions, OuterSquareSize, InnerSquareSize, NumberFont, BlueMovements, RedMovements, BaseBlue, BaseRed, BaseWhite, BaseBlack)
+                                DrawScreen(PlayingGrid, ROGUE_HUNTERWindow, WindowDimensions, GridDimensions, OuterSquareSize, InnerSquareSize, FontList, BlueMovements, RedMovements, BASE_BLUE, BASE_RED, BASE_WHITE, BASE_BLACK)
                         elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
-                            if CurrentBluePlayerPosition[0] < (NumberOfColumns-1):
+                            if CurrentBluePlayerPosition[0] < (NUMBER_OF_COLUMNS-1):
                                 PlayingGrid[str(CurrentBluePlayerPosition)][2] = 0
                                 CurrentBluePlayerPosition[0] += 1
                                 PlayingGrid[str(CurrentBluePlayerPosition)][2] = 1
                                 CurrentTurnMovements += 1
                                 BlueMovements -= 1
-                                DrawScreen(PlayingGrid, ROGUE_HUNTERWindow, WindowDimensions, GridDimensions, OuterSquareSize, InnerSquareSize, NumberFont, BlueMovements, RedMovements, BaseBlue, BaseRed, BaseWhite, BaseBlack)
-                if CurrentTurnMovements == MaxMovements or NextTurnSwitch == True:
+                                DrawScreen(PlayingGrid, ROGUE_HUNTERWindow, WindowDimensions, GridDimensions, OuterSquareSize, InnerSquareSize, FontList, BlueMovements, RedMovements, BASE_BLUE, BASE_RED, BASE_WHITE, BASE_BLACK)
+                if CurrentTurnMovements == MAX_MOVEMENTS or NextTurnSwitch == True:
                     CurrentPlayer = 'Red'
                     NextTurnSwitch = False
                     CurrentTurnMovements = 0
                     break
                 if CurrentBluePlayerPosition == CurrentRedPlayerPosition:
+                    WhiteGrid(PlayingGrid)
+                    pygame.draw.rect(ROGUE_HUNTERWindow, BASE_BLACK, (0, 0, WindowDimensions[0], WindowDimensions[1]), 0)
+                    DrawingGrid(PlayingGrid, ROGUE_HUNTERWindow, OuterSquareSize, InnerSquareSize, BASE_BLACK, BASE_BLUE, BASE_RED, BASE_WHITE)
                     Winner = "Blue"
-                    GameOver(ROGUE_HUNTERWindow,
+                    GameOver(ROGUE_HUNTERWindow, FontList, Winner, BASE_BLUE, BASE_RED, BASE_WHITE)
                 if BlueMovements == 0 and RedMovements == 0:
-                    GameOver(ROGUE_HUNTERWindow, PlainTextFont, CurrentPlayer, BaseBlue, BaseRed)
-                    pygame.event.clear()
-                    pygame.event.wait()
-                    if event.type == pygame.KEYDOWN:
-                        Quit()
+                    pygame.draw.rect(ROGUE_HUNTERWindow, BASE_BLACK, (0, 0, WindowDimensions[0], WindowDimensions[1]), 0)
+                    Winner = "None"
+                    GameOver(ROGUE_HUNTERWindow, FontList, Winner, BASE_BLUE, BASE_RED, BASE_WHITE)
+
         elif CurrentPlayer == 'Red':
-            TurnChange(ROGUE_HUNTERWindow, FontList, CurrentPlayer, BaseBlue, BaseRed)
+            TurnChange(ROGUE_HUNTERWindow, FontList, CurrentPlayer, BASE_BLUE, BASE_RED)
             while True:
                 for event in pygame.event.get():
                     if event.type == QUIT:
@@ -413,7 +399,7 @@ def main():
                             Quit()
                         elif event.key == pygame.K_f:
                             Fullscreen(ROGUE_HUNTERWindow, WindowDimensions)
-                            DrawScreen(PlayingGrid, ROGUE_HUNTERWindow, WindowDimensions, GridDimensions, OuterSquareSize, InnerSquareSize, NumberFont, BlueMovements, RedMovements, BaseBlue, BaseRed, BaseWhite, BaseBlack)
+                            DrawScreen(PlayingGrid, ROGUE_HUNTERWindow, WindowDimensions, GridDimensions, OuterSquareSize, InnerSquareSize, FontList, BlueMovements, RedMovements, BASE_BLUE, BASE_RED, BASE_WHITE, BASE_BLACK)
                         elif event.key == pygame.K_RETURN:
                             if CurrentTurnMovements == 0:
                                 pass
@@ -426,15 +412,15 @@ def main():
                                 PlayingGrid[str(CurrentRedPlayerPosition)][2] = 2
                                 CurrentTurnMovements += 1
                                 RedMovements -= 1
-                                DrawScreen(PlayingGrid, ROGUE_HUNTERWindow, WindowDimensions, GridDimensions, OuterSquareSize, InnerSquareSize, NumberFont, BlueMovements, RedMovements, BaseBlue, BaseRed, BaseWhite, BaseBlack)
+                                DrawScreen(PlayingGrid, ROGUE_HUNTERWindow, WindowDimensions, GridDimensions, OuterSquareSize, InnerSquareSize, FontList, BlueMovements, RedMovements, BASE_BLUE, BASE_RED, BASE_WHITE, BASE_BLACK)
                         elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
-                            if CurrentRedPlayerPosition[1] < (NumberOfLines-1):
+                            if CurrentRedPlayerPosition[1] < (NUMBER_OF_LINES-1):
                                 PlayingGrid[str(CurrentRedPlayerPosition)][2] = 0
                                 CurrentRedPlayerPosition[1] += 1
                                 PlayingGrid[str(CurrentRedPlayerPosition)][2] = 2
                                 CurrentTurnMovements += 1
                                 RedMovements -= 1
-                                DrawScreen(PlayingGrid, ROGUE_HUNTERWindow, WindowDimensions, GridDimensions, OuterSquareSize, InnerSquareSize, NumberFont, BlueMovements, RedMovements, BaseBlue, BaseRed, BaseWhite, BaseBlack)
+                                DrawScreen(PlayingGrid, ROGUE_HUNTERWindow, WindowDimensions, GridDimensions, OuterSquareSize, InnerSquareSize, FontList, BlueMovements, RedMovements, BASE_BLUE, BASE_RED, BASE_WHITE, BASE_BLACK)
                         elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
                             if CurrentRedPlayerPosition[0] > 0:
                                 PlayingGrid[str(CurrentRedPlayerPosition)][2] = 0
@@ -442,16 +428,16 @@ def main():
                                 PlayingGrid[str(CurrentRedPlayerPosition)][2] = 2
                                 CurrentTurnMovements += 1
                                 RedMovements -= 1
-                                DrawScreen(PlayingGrid, ROGUE_HUNTERWindow, WindowDimensions, GridDimensions, OuterSquareSize, InnerSquareSize, NumberFont, BlueMovements, RedMovements, BaseBlue, BaseRed, BaseWhite, BaseBlack)
+                                DrawScreen(PlayingGrid, ROGUE_HUNTERWindow, WindowDimensions, GridDimensions, OuterSquareSize, InnerSquareSize, FontList, BlueMovements, RedMovements, BASE_BLUE, BASE_RED, BASE_WHITE, BASE_BLACK)
                         elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
-                            if CurrentBluePlayerPosition[0] < (NumberOfColumns-1):
+                            if CurrentBluePlayerPosition[0] < (NUMBER_OF_COLUMNS-1):
                                 PlayingGrid[str(CurrentRedPlayerPosition)][2] = 0
                                 CurrentRedPlayerPosition[0] += 1
                                 PlayingGrid[str(CurrentRedPlayerPosition)][2] = 2
                                 CurrentTurnMovements += 1
                                 RedMovements -= 1
-                                DrawScreen(PlayingGrid, ROGUE_HUNTERWindow, WindowDimensions, GridDimensions, OuterSquareSize, InnerSquareSize, NumberFont, BlueMovements, RedMovements, BaseBlue, BaseRed, BaseWhite, BaseBlack)
-                if CurrentTurnMovements == MaxMovements or NextTurnSwitch == True:
+                                DrawScreen(PlayingGrid, ROGUE_HUNTERWindow, WindowDimensions, GridDimensions, OuterSquareSize, InnerSquareSize, FontList, BlueMovements, RedMovements, BASE_BLUE, BASE_RED, BASE_WHITE, BASE_BLACK)
+                if CurrentTurnMovements == MAX_MOVEMENTS or NextTurnSwitch == True:
                     CurrentPlayer = 'Blue'
                     NextTurnSwitch = False
                     CurrentTurnMovements = 0
@@ -459,31 +445,23 @@ def main():
                 if RedMovements == 0 and BlueMovements == 0:
                     pass
                 if CurrentBluePlayerPosition == CurrentRedPlayerPosition:
-                    GameOver(ROGUE_HUNTERWindow, PlainTextFont, CurrentPlayer, BaseBlue, BaseRed)
-                    pygame.event.clear()
-                    pygame.event.wait()
-                    if event.type == pygame.KEYDOWN:
-                        Quit()
+                    WhiteGrid(PlayingGrid)
+                    pygame.draw.rect(ROGUE_HUNTERWindow, BASE_BLACK, (0, 0, WindowDimensions[0], WindowDimensions[1]), 0)
+                    DrawingGrid(PlayingGrid, ROGUE_HUNTERWindow, OuterSquareSize, InnerSquareSize, BASE_BLACK, BASE_BLUE, BASE_RED, BASE_WHITE)
+                    Winner = "Red"
+                    GameOver(ROGUE_HUNTERWindow, FontList, Winner, BASE_BLUE, BASE_RED, BASE_WHITE)
+                if BlueMovements == 0 and RedMovements == 0:
+                    pygame.draw.rect(ROGUE_HUNTERWindow, BASE_BLACK, (0, 0, WindowDimensions[0], WindowDimensions[1]), 0)
+                    Winner = "None"
+                    GameOver(ROGUE_HUNTERWindow, FontList, Winner, BASE_BLUE, BASE_RED, BASE_WHITE)
 
 # GENERAL VARIABLES
 WindowDimensions = [0, 0]
 GridDimensions = [0, 0]
 PlayingGrid = {}
-RedPlayerStart = [9, 4]
-BluePlayerStart = [9, 15]
-CurrentRedPlayerPosition = copy.deepcopy(RedPlayerStart)
-CurrentBluePlayerPosition = copy.deepcopy(BluePlayerStart)
-NumberOfColumns = 19
-NumberOfLines = 20
-MaxMovements = 10
-FPS = 30
-CurrentVersion = "v0.1"
+CurrentRedPlayerPosition = copy.deepcopy(RED_PLAYER_START)
+CurrentBluePlayerPosition = copy.deepcopy(BLUE_PLAYER_START)
 
-# COLOURS DEFINITION
-BaseBlack = (0, 0, 0)
-BaseWhite = (255, 255, 255)
-BaseRed = (255, 0, 0)
-BaseBlue = (0, 0, 255)
                 
 # CALCULATING THE SIZE OF THE WINDOW AND THE ONSCREEN ELEMENTS
 ScreenWidth = win32api.GetSystemMetrics(0)
@@ -500,7 +478,7 @@ StartingPointA = [int((ScreenWidth - GridWidth) / 2), int((ScreenHeight - GridHe
 StartingPointB = [copy.deepcopy(int(StartingPointA[0] + (OuterSquareSize - InnerSquareSize))),    
                  copy.deepcopy(int(StartingPointA[1] + (OuterSquareSize - InnerSquareSize)))]
 global FPSClock, ROGUE_HUNTERWindow, CurrentPlayer
-PlayingGrid = GridConstructor(RedPlayerStart, BluePlayerStart, OuterSquareSize, StartingPointA, StartingPointB)
+PlayingGrid = GridConstructor(RED_PLAYER_START, BLUE_PLAYER_START, OuterSquareSize, StartingPointA, StartingPointB)
 
 if __name__ == '__main__':
     main()
