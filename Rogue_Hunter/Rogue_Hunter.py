@@ -175,10 +175,11 @@ def GameOver(Window, FontList, Winner, Blue, Red, White):
         Window.blit(SecondGameOverLine, SecondLinePosition)
         pygame.display.update()
     elif Winner == "Red":
-        WinnerColour == Red
+        WinnerColour = Red
         FirstGameOverLine = FontList["BodyFont"][1].render('Game Over! Red Player is the winner', False, WinnerColour)
         SecondGameOverLine = FontList["BodyFont"][1].render('Press a key to continue', False, WinnerColour)
         FirstLineWidth = FirstGameOverLine.get_width()
+        FirstLineHeight = FirstGameOverLine.get_height()
         TextHeight = FirstGameOverLine.get_height()
         SecondLineWidth = SecondGameOverLine.get_width()
         FirstLinePosition = ((ScreenWidth - FirstLineWidth) / 2, (ScreenHeight / 2) - (FirstLineHeight - 2))
@@ -187,10 +188,11 @@ def GameOver(Window, FontList, Winner, Blue, Red, White):
         Window.blit(SecondGameOverLine, SecondLinePosition)
         pygame.display.update()
     else:
-        WinnerColour == White
+        WinnerColour = White
         FirstGameOverLine = FontList["BodyFont"][1].render('Both players run out of movements! Nobody won!', False, WinnerColour)
         SecondGameOverLine = FontList["BodyFont"][1].render('Press a key to continue', False, WinnerColour)
         FirstLineWidth = FirstGameOverLine.get_width()
+        FirstLineHeight = FirstGameOverLine.get_height()
         TextHeight = FirstGameOverLine.get_height()
         SecondLineWidth = SecondGameOverLine.get_width()
         FirstLinePosition = ((ScreenWidth - FirstLineWidth) / 2, (ScreenHeight / 2) - (TextHeight - 2))
@@ -202,10 +204,10 @@ def GameOver(Window, FontList, Winner, Blue, Red, White):
         if event.type == pygame.QUIT:
             Quit()
         if event.type == pygame.KEYDOWN:
-            if event.key == K_ESCAPE:
-                Quit()
+            if event.key == K_f:
+                Fullscreen(Window, WindowDimensions)
             else:
-                return
+                Quit()
 
 def GameInstructionsScreen(Window, FontDictionary, White, Black):
     WindowHeight = Window.get_height()
@@ -246,14 +248,12 @@ def GameInstructionsScreen(Window, FontDictionary, White, Black):
     FifthBindingWidth = FifthBinding.get_width()
     BindingsFirstYGap = (WindowWidth - (SecondBindingWidth + ThirdBindingWidth)) / 3
     BindingsSecondYGap = (WindowWidth - (FourthBindingWidth + FifthBindingWidth)) / 3
-    BindingsGap = (BindingsX - (FontDictionary["HeaderFont"][0] + FontDictionary["BodyFont"][0] * 2))
     for line in range(3):
-        Position += BindingsGap
         BindingsXPosition[line] = Position
         if line == 0:
             Position += FontDictionary["HeaderFont"][0]
         else:
-            Position += FontDictionary["BodyFont"][0]
+            Position += (FontDictionary["BodyFont"][0] + WindowHeight*0.02)
     for item in range(5):
         if item == 0:
             BindingsYPosition[item] = (WindowWidth - FirstBindingWidth) / 2
@@ -266,7 +266,7 @@ def GameInstructionsScreen(Window, FontDictionary, White, Black):
         elif item == 4:
             BindingsYPosition[item] = (BindingsSecondYGap * 2) + FourthBindingWidth
     LastLineWidth = LastLine.get_width()
-    LastLinePosition = (WindowWidth - LastLineWidth) / 2, WindowHeight * 0.9
+    LastLinePosition = (WindowWidth - LastLineWidth) / 2, WindowHeight * 0.85
     while True:
         pygame.draw.rect(Window, Black, (0, 0, WindowDimensions[0], WindowDimensions[1]), 0)
         Window.blit(InstructionsHeader, HeaderPosition)
@@ -387,7 +387,6 @@ def main():
                     pygame.draw.rect(ROGUE_HUNTERWindow, BASE_BLACK, (0, 0, WindowDimensions[0], WindowDimensions[1]), 0)
                     Winner = "None"
                     GameOver(ROGUE_HUNTERWindow, FontList, Winner, BASE_BLUE, BASE_RED, BASE_WHITE)
-
         elif CurrentPlayer == 'Red':
             TurnChange(ROGUE_HUNTERWindow, FontList, CurrentPlayer, BASE_BLUE, BASE_RED)
             while True:
