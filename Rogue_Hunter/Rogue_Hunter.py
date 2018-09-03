@@ -6,6 +6,8 @@ from pygame.locals import *
 from constants import *
 import win32api
 import copy
+import time
+
 
 # FUNCTIONS DEFINITIONS
 #
@@ -74,7 +76,21 @@ def TextfontCalculator(DimensionValues):
 def WhiteGrid(InputGrid):
     for item, value in InputGrid.items():
         value[2] = 0
-        
+
+def Fullscreen (Window, WindowDimensions):
+    flags = Window.get_flags()
+    if flags == 0:
+        Window = pygame.display.set_mode(WindowDimensions, pygame.FULLSCREEN)
+    else:
+        Window = pygame.display.set_mode(WindowDimensions)
+
+def Quit():
+    pygame.quit()
+    sys.exit()
+
+#     
+#====================
+#FRONT END FUNCTIONS:
 
 def DrawingGrid(InputGrid, Window, OuterSquareSize, InnerSquareSize, Black, Blue, Red, White):
     x = 0
@@ -117,15 +133,31 @@ def DrawScreen(InputGrid, Window, WindowDimensions, GridDimensions, OuterSquareS
     DrawMovements(Window, GridDimensions, FontList, BluePlayerMovements, RedPlayerMovements, Blue, Red, Black)
     pygame.display.update()
 
-def GameTitle(Window, WindowDimensions, FontDictionary, CurrentVersion, White, Black):
-    Title = FontDictionary["TitleFont"][1].render("ROGUE HUNTER", False, White)
-    Version = FontDictionary["BodyFont"][1].render(CurrentVersion, False, White)
+def GameTitle(Window, WindowDimensions, FontDictionary, CurrentVersion):
+    TitleWhite = [255, 255, 255, 0]
+    Black = BASE_BLACK
+    TitleLetters = ("R", "O", "G", "U", "E", " ", "H", "U", "N", "T", "E", "R")
+    Title = FontDictionary["TitleFont"][1].render("ROGUE HUNTER", False, TitleWhite)
     TextWidth = Title.get_width()
     TextHeight = Title.get_height()
-    VersionHeight = Version.get_height()
-    VersionWidth = Version.get_width()
     TitleXPosition = (WindowDimensions[0] - TextWidth) / 2
     TitleYPosition = (WindowDimensions[1] / 2) - (TextHeight / 2)
+    for letter in TitleLetters:
+        if letter == " ":
+           TitleXPosition += CurrentLetterWidth
+        else:
+            while TitleWhite[3] <= 100:
+                CurrentLetter = FontDictionary["TitleFont"][1].render(letter, False, TitleWhite)
+                Window.blit(CurrentLetter, (TitleXPosition, TitleYPosition))
+                TitleWhite[3] += 1
+                time.sleep(0.01)
+                pygame.display.update()
+            TitleWhite[3] = 0
+            CurrentLetterWidth = CurrentLetter.get_width()
+            TitleXPosition += CurrentLetterWidth
+    Version = FontDictionary["BodyFont"][1].render(CurrentVersion, False, TitleWhite)
+    VersionHeight = Version.get_height()
+    VersionWidth = Version.get_width()
     VersionXPosition = (WindowDimensions[0] - VersionWidth) / 2
     VersionYPosition = TitleYPosition + TextHeight 
     while True:
@@ -295,19 +327,8 @@ def GameInstructionsScreen(Window, FontDictionary, White, Black):
                 else:
                     return
 
-def Fullscreen (Window, WindowDimensions):
-    flags = Window.get_flags()
-    print flags
-    if flags == 0:
-        Window = pygame.display.set_mode(WindowDimensions, pygame.FULLSCREEN)
-    else:
-        Window = pygame.display.set_mode(WindowDimensions)
-
-def Quit():
-    pygame.quit()
-    sys.exit()
-
 #MAIN LOOP
+
 def main():
     pygame.init()
     pygame.font.init()
@@ -319,7 +340,7 @@ def main():
     NextTurnSwitch = False
     pygame.display.set_caption('Rogue Hunter')
     ROGUE_HUNTERWindow = pygame.display.set_mode(WindowDimensions)
-    GameTitle(ROGUE_HUNTERWindow, WindowDimensions, FontList, CURRENT_VERSION, BASE_WHITE, BASE_BLACK)
+    GameTitle(ROGUE_HUNTERWindow, WindowDimensions, FontList, CURRENT_VERSION)
     GameInstructionsScreen(ROGUE_HUNTERWindow, FontList, BASE_WHITE, BASE_BLACK)
     DrawScreen(PlayingGrid, ROGUE_HUNTERWindow, WindowDimensions, GridDimensions, OuterSquareSize, InnerSquareSize, FontList, BlueMovements, RedMovements, BASE_BLUE, BASE_RED, BASE_WHITE, BASE_BLACK)
     while True:
