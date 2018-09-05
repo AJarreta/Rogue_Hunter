@@ -148,6 +148,7 @@ def GameTitle(Window, WindowDimensions, FontDictionary, CurrentVersion):
         else:
             while TitleWhite[3] <= 100:
                 CurrentLetter = FontDictionary["TitleFont"][1].render(letter, False, TitleWhite)
+                CurrentLetter.set_alpha(TitleWhite[3])
                 Window.blit(CurrentLetter, (TitleXPosition, TitleYPosition))
                 TitleWhite[3] += 1
                 time.sleep(0.01)
@@ -155,6 +156,16 @@ def GameTitle(Window, WindowDimensions, FontDictionary, CurrentVersion):
             TitleWhite[3] = 0
             CurrentLetterWidth = CurrentLetter.get_width()
             TitleXPosition += CurrentLetterWidth
+    TitleWhite[3] = 100
+    FadeInSurface = pygame.Surface((WindowDimensions[0], WindowDimensions[1]))
+    FadeInSurface.fill(TitleWhite)
+    while TitleWhite[3] > 0:
+        TitleWhite[3] -= 1
+        FadeInSurface.set_alpha(TitleWhite[3])
+        Window.blit(FadeInSurface, (0, 0))
+        pygame.display.update()
+        time.sleep (0.05)     
+    TitleXPosition = (WindowDimensions[0] - TextWidth) / 2
     Version = FontDictionary["BodyFont"][1].render(CurrentVersion, False, TitleWhite)
     VersionHeight = Version.get_height()
     VersionWidth = Version.get_width()
