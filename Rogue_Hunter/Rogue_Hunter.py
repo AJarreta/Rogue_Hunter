@@ -7,6 +7,7 @@ from constants import *
 import win32api
 import copy
 import time
+import decimal
 
 
 # FUNCTIONS DEFINITIONS
@@ -146,25 +147,27 @@ def GameTitle(Window, WindowDimensions, FontDictionary, CurrentVersion):
         if letter == " ":
            TitleXPosition += CurrentLetterWidth
         else:
-            while TitleWhite[3] <= 100:
+            while TitleWhite[3] < 100:
+                TitleWhite[3] += 1
                 CurrentLetter = FontDictionary["TitleFont"][1].render(letter, False, TitleWhite)
                 CurrentLetter.set_alpha(TitleWhite[3])
                 Window.blit(CurrentLetter, (TitleXPosition, TitleYPosition))
-                TitleWhite[3] += 1
-                time.sleep(0.01)
+                time.sleep(0.008)
                 pygame.display.update()
             TitleWhite[3] = 0
             CurrentLetterWidth = CurrentLetter.get_width()
             TitleXPosition += CurrentLetterWidth
-    TitleWhite[3] = 100
     FadeInSurface = pygame.Surface((WindowDimensions[0], WindowDimensions[1]))
     FadeInSurface.fill(TitleWhite)
-    while TitleWhite[3] > 0:
-        TitleWhite[3] -= 1
+    OpacityRounds = 1
+    while TitleWhite[3] < 100.0:
+        TitleWhite[3] = 1.1 ** OpacityRounds
         FadeInSurface.set_alpha(TitleWhite[3])
         Window.blit(FadeInSurface, (0, 0))
+        OpacityRounds += 1
         pygame.display.update()
-        time.sleep (0.05)     
+        time.sleep (0.015)
+    time.sleep(0.7)  
     TitleXPosition = (WindowDimensions[0] - TextWidth) / 2
     Version = FontDictionary["BodyFont"][1].render(CurrentVersion, False, TitleWhite)
     VersionHeight = Version.get_height()
@@ -397,7 +400,7 @@ def main():
                                 BlueMovements -= 1
                                 DrawScreen(PlayingGrid, ROGUE_HUNTERWindow, WindowDimensions, GridDimensions, OuterSquareSize, InnerSquareSize, FontList, BlueMovements, RedMovements, BASE_BLUE, BASE_RED, BASE_WHITE, BASE_BLACK)
                         elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
-                            if CurrentBluePlayerPosition[0] < (NUMBER_OF_COLUMNS-1):
+                            if CurrentBluePlayerPosition[0] < (NUMBER_OF_COLUMNS - 1):
                                 PlayingGrid[str(CurrentBluePlayerPosition)][2] = 0
                                 CurrentBluePlayerPosition[0] += 1
                                 PlayingGrid[str(CurrentBluePlayerPosition)][2] = 1
@@ -445,7 +448,7 @@ def main():
                                 RedMovements -= 1
                                 DrawScreen(PlayingGrid, ROGUE_HUNTERWindow, WindowDimensions, GridDimensions, OuterSquareSize, InnerSquareSize, FontList, BlueMovements, RedMovements, BASE_BLUE, BASE_RED, BASE_WHITE, BASE_BLACK)
                         elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
-                            if CurrentRedPlayerPosition[1] < (NUMBER_OF_LINES-1):
+                            if CurrentRedPlayerPosition[1] < (NUMBER_OF_LINES - 1):
                                 PlayingGrid[str(CurrentRedPlayerPosition)][2] = 0
                                 CurrentRedPlayerPosition[1] += 1
                                 PlayingGrid[str(CurrentRedPlayerPosition)][2] = 2
@@ -461,7 +464,7 @@ def main():
                                 RedMovements -= 1
                                 DrawScreen(PlayingGrid, ROGUE_HUNTERWindow, WindowDimensions, GridDimensions, OuterSquareSize, InnerSquareSize, FontList, BlueMovements, RedMovements, BASE_BLUE, BASE_RED, BASE_WHITE, BASE_BLACK)
                         elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
-                            if CurrentBluePlayerPosition[0] < (NUMBER_OF_COLUMNS-1):
+                            if CurrentRedPlayerPosition[0] < (NUMBER_OF_COLUMNS - 1):
                                 PlayingGrid[str(CurrentRedPlayerPosition)][2] = 0
                                 CurrentRedPlayerPosition[0] += 1
                                 PlayingGrid[str(CurrentRedPlayerPosition)][2] = 2
