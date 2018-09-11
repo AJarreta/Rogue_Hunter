@@ -24,6 +24,13 @@
   <ItemGroup>
     <Compile Include="Rogue_Hunter.py" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="sounds\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="sounds\playermovement.wav" />
+    <Content Include="sounds\titleletters.wav" />
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <PtvsTargetsFile>$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets</PtvsTargetsFile>

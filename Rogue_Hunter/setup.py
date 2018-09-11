@@ -14,6 +14,7 @@ try:
     from distutils.core import setup
     import py2exe, pygame
     from modulefinder import Module
+    from constants import CURRENT_VERSION
     import glob, fnmatch
     import sys, os, shutil
     import operator
@@ -51,14 +52,14 @@ class BuildExe:
         self.project_url = "about:none"
 
         #Version of program
-        self.project_version = "0.2"
+        self.project_version = CURRENT_VERSION
 
         #License of the program
         self.license = "MyApps License"
 
         #Auhor of program
-        self.author_name = "Me"
-        self.author_email = "example@example.com"
+        self.author_name = "Antonio Jarreta"
+        self.author_email = "children.of.revolution@gmail.com"
         self.copyright = "Copyright (c) 2009 Me."
 
         #Description

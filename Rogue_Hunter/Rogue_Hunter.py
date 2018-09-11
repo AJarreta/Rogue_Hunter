@@ -7,7 +7,6 @@ from constants import *
 import win32api
 import copy
 import time
-import decimal
 
 
 # FUNCTIONS DEFINITIONS
@@ -143,6 +142,7 @@ def GameTitle(Window, WindowDimensions, FontDictionary, CurrentVersion):
     TextHeight = Title.get_height()
     TitleXPosition = (WindowDimensions[0] - TextWidth) / 2
     TitleYPosition = (WindowDimensions[1] / 2) - (TextHeight / 2)
+    SoundEffect = pygame.mixer.Sound("titleletters.wav")
     for letter in TitleLetters:
         if letter == " ":
            TitleXPosition += CurrentLetterWidth
@@ -157,6 +157,7 @@ def GameTitle(Window, WindowDimensions, FontDictionary, CurrentVersion):
             TitleWhite[3] = 0
             CurrentLetterWidth = CurrentLetter.get_width()
             TitleXPosition += CurrentLetterWidth
+            SoundEffect.play()
     FadeInSurface = pygame.Surface((WindowDimensions[0], WindowDimensions[1]))
     FadeInSurface.fill(TitleWhite)
     OpacityRounds = 1
