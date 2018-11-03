@@ -243,3 +243,4 @@ ModelManifest.xml
 
 # FAKE - F# Make
 .fake/
+/Rogue_Hunter/Rogue_Hunter.spec

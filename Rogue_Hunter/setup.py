@@ -33,11 +33,11 @@ py2exe.build_exe.isSystemDLL = isSystemDLL # override the default function with 
 class pygame2exe(py2exe.build_exe.py2exe): #This hack make sure that pygame default font is copied: no need to modify code for specifying default font
     def copy_extensions(self, extensions):
         #Get pygame default font
-        pygamedir = os.path.split(pygame.base.__file__)[0]
-        pygame_default_font = os.path.join(pygamedir, pygame.font.get_default_font())
+        #pygamedir = os.path.split(pygame.base.__file__)[0]
+        pygame_default_font = "C:\Users/User/Documents/Visual Studio 2015/Projects/RogueHunter/Rogue_Hunter/Rogue_Hunter/font/visitor1.ttf"
 
         #Add font to list of extension to be copied
-        extensions.append(Module("pygame.font", pygame_default_font))
+        extensions.append(Module("visitortt1brk", pygame_default_font))
         py2exe.build_exe.py2exe.copy_extensions(self, extensions)
 
 class BuildExe:
@@ -60,7 +60,7 @@ class BuildExe:
         #Auhor of program
         self.author_name = "Antonio Jarreta"
         self.author_email = "children.of.revolution@gmail.com"
-        self.copyright = "Copyright (c) 2009 Me."
+        self.copyright = "Copyright (c) 2018 Antonio Jarreta."
 
         #Description
         self.project_description = "MyApps Description"

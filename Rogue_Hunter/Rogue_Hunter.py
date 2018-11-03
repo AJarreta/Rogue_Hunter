@@ -7,6 +7,8 @@ from constants import *
 import win32api
 import copy
 import time
+import thread
+import traceback
 
 
 # FUNCTIONS DEFINITIONS
@@ -79,10 +81,11 @@ def WhiteGrid(InputGrid):
 
 def Fullscreen (Window, WindowDimensions):
     flags = Window.get_flags()
-    if flags == 0:
+    print flags
+    if flags == 0 or flags == 16:
         Window = pygame.display.set_mode(WindowDimensions, pygame.FULLSCREEN)
     else:
-        Window = pygame.display.set_mode(WindowDimensions)
+        Window = pygame.display.set_mode(WindowDimensions, pygame.RESIZABLE)
 
 def Quit():
     pygame.quit()
@@ -133,7 +136,7 @@ def DrawScreen(InputGrid, Window, WindowDimensions, GridDimensions, OuterSquareS
     DrawMovements(Window, GridDimensions, FontList, BluePlayerMovements, RedPlayerMovements, Blue, Red, Black)
     pygame.display.update()
 
-def GameTitle(Window, WindowDimensions, FontDictionary, CurrentVersion):
+def GameTitleAnimation(Window, WindowDimensions, FontDictionary, CurrentVersion):
     TitleWhite = [255, 255, 255, 0]
     Black = BASE_BLACK
     TitleLetters = ("R", "O", "G", "U", "E", " ", "H", "U", "N", "T", "E", "R")
@@ -142,7 +145,6 @@ def GameTitle(Window, WindowDimensions, FontDictionary, CurrentVersion):
     TextHeight = Title.get_height()
     TitleXPosition = (WindowDimensions[0] - TextWidth) / 2
     TitleYPosition = (WindowDimensions[1] / 2) - (TextHeight / 2)
-    SoundEffect = pygame.mixer.Sound("titleletters.wav")
     for letter in TitleLetters:
         if letter == " ":
            TitleXPosition += CurrentLetterWidth
@@ -153,11 +155,13 @@ def GameTitle(Window, WindowDimensions, FontDictionary, CurrentVersion):
                 CurrentLetter.set_alpha(TitleWhite[3])
                 Window.blit(CurrentLetter, (TitleXPosition, TitleYPosition))
                 time.sleep(0.008)
-                pygame.display.update()
+                try: 
+                    pygame.display.update()
+                except Exception:
+                    traceback.print_exception
             TitleWhite[3] = 0
             CurrentLetterWidth = CurrentLetter.get_width()
             TitleXPosition += CurrentLetterWidth
-            SoundEffect.play()
     FadeInSurface = pygame.Surface((WindowDimensions[0], WindowDimensions[1]))
     FadeInSurface.fill(TitleWhite)
     OpacityRounds = 1
@@ -170,16 +174,33 @@ def GameTitle(Window, WindowDimensions, FontDictionary, CurrentVersion):
         time.sleep (0.015)
     time.sleep(0.7)  
     TitleXPosition = (WindowDimensions[0] - TextWidth) / 2
-    Version = FontDictionary["BodyFont"][1].render(CurrentVersion, False, TitleWhite)
+    Version = FontDictionary["BodyFont"][1].render("0,2", False, TitleWhite)
     VersionHeight = Version.get_height()
     VersionWidth = Version.get_width()
     VersionXPosition = (WindowDimensions[0] - VersionWidth) / 2
-    VersionYPosition = TitleYPosition + TextHeight 
+    VersionYPosition = TitleYPosition + TextHeight
     while True:
         pygame.draw.rect(Window, Black, (0, 0, WindowDimensions[0], WindowDimensions[1]), 0)
         Window.blit(Title, (TitleXPosition, TitleYPosition))
         Window.blit(Version, (VersionXPosition, VersionYPosition))
         pygame.display.update()
+
+def GameTitle(Window, WindowDimensions, FontDictionary, CurrentVersion):
+    try:
+        thread.start_new_thread(GameTitleAnimation, (Window, WindowDimensions, FontDictionary, CurrentVersion))
+    except:
+        print "There was an error while loading the screen. Press one key to exit the program."
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                Quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == K_ESCAPE:
+                    Quit()
+                elif event.key == K_f:
+                    Fullscreen(Window, WindowDimensions)
+                else:
+                    return
+    while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 Quit()
@@ -354,7 +375,7 @@ def main():
     CurrentTurnMovements = 0
     NextTurnSwitch = False
     pygame.display.set_caption('Rogue Hunter')
-    ROGUE_HUNTERWindow = pygame.display.set_mode(WindowDimensions)
+    ROGUE_HUNTERWindow = pygame.display.set_mode(WindowDimensions, pygame.RESIZABLE)
     GameTitle(ROGUE_HUNTERWindow, WindowDimensions, FontList, CURRENT_VERSION)
     GameInstructionsScreen(ROGUE_HUNTERWindow, FontList, BASE_WHITE, BASE_BLACK)
     DrawScreen(PlayingGrid, ROGUE_HUNTERWindow, WindowDimensions, GridDimensions, OuterSquareSize, InnerSquareSize, FontList, BlueMovements, RedMovements, BASE_BLUE, BASE_RED, BASE_WHITE, BASE_BLACK)
